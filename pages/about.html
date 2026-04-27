@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISS — About</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f2efe8;
+    --cyan: #00e5ff;
+    --red: #ff2d55;
+    --muted: rgba(242,239,232,0.5);
+    --grid: rgba(0,229,255,0.06);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--ink); color: var(--paper); overflow-x: hidden; cursor: none; }
+
+  /* ── CURSOR ── */
+  .cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; }
+  .cursor-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; transform: translate(-50%,-50%); }
+  .cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(0,229,255,0.4); border-radius: 50%; transform: translate(-50%,-50%); transition: width .2s, height .2s, border-color .2s; position: absolute; top: 0; left: 0; }
+  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 52px; height: 52px; border-color: var(--cyan); }
+
+  body::before { content: ''; position: fixed; inset: 0; z-index: 9990; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 6%;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(0,229,255,0.1);
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 20px rgba(0,229,255,0.5); text-decoration: none; }
+  nav ul { list-style: none; display: flex; gap: 8px; }
+  nav ul li a { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(242,239,232,0.55); text-decoration: none; padding: 7px 14px; border: 1px solid transparent; border-radius: 2px; transition: all .2s; }
+  nav ul li a:hover, nav ul li a.active { color: var(--cyan); border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.05); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    min-height: 44vh; padding: 160px 6% 80px;
+    position: relative; overflow: hidden; display: flex; align-items: flex-end;
+  }
+  .page-header::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px; animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
+  .page-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 160px; background: linear-gradient(transparent, var(--ink)); }
+  .header-ghost { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(100px, 18vw, 220px); color: rgba(0,229,255,0.04); letter-spacing: 8px; right: 4%; bottom: -20px; line-height: 1; user-select: none; z-index: 0; }
+  .page-header-content { position: relative; z-index: 2; }
+  .breadcrumb { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: rgba(0,229,255,0.6); margin-bottom: 16px; }
+  .breadcrumb a { color: inherit; text-decoration: none; }
+  .breadcrumb a:hover { color: var(--cyan); }
+  .page-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 8vw, 110px); line-height: 0.9; letter-spacing: 3px; }
+  .page-header h1 em { font-style: normal; color: var(--cyan); }
+
+  /* ── TICKER ── */
+  .ticker { background: var(--cyan); color: var(--ink); padding: 10px 0; overflow: hidden; }
+  .ticker-inner { display: flex; animation: tickerScroll 30s linear infinite; white-space: nowrap; }
+  .ticker-item { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 0 40px; flex-shrink: 0; }
+  .ticker-item::before { content: '◆'; margin-right: 40px; opacity: 0.5; }
+  @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ── SECTION UTILITIES ── */
+  .main { padding: 90px 6% 120px; }
+  .section-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,229,255,0.4), transparent); }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 4vw, 60px); letter-spacing: 2px; margin-bottom: 40px; line-height: 1; }
+
+  /* ── SUPERVISOR ── */
+  .supervisor-wrap {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2px;
+    margin-bottom: 100px;
+  }
+
+  .supervisor-badge {
+    padding: 48px 40px;
+    background: rgba(0,229,255,0.04);
+    border: 1px solid rgba(0,229,255,0.2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; overflow: hidden; text-align: center;
+  }
+  .supervisor-badge::before {
+    content: 'SUP';
+    position: absolute; right: -10px; bottom: -20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px; color: rgba(0,229,255,0.05);
+    line-height: 1; pointer-events: none;
+  }
+
+  /* Photo frame */
+  .sup-photo-wrap {
+    position: relative; margin-bottom: 28px;
+  }
+  .sup-photo {
+    width: 140px; height: 140px;
+    object-fit: cover; object-position: top center;
+    border: 2px solid rgba(0,229,255,0.3);
+    display: block;
+    filter: grayscale(20%) contrast(1.05);
+    transition: filter .3s;
+  }
+  .supervisor-badge:hover .sup-photo { filter: grayscale(0%) contrast(1.1); }
+
+  /* Corner brackets around photo */
+  .sup-photo-wrap::before, .sup-photo-wrap::after {
+    content: ''; position: absolute;
+    width: 16px; height: 16px;
+    border-color: var(--cyan); border-style: solid;
+  }
+  .sup-photo-wrap::before { top: -5px; left: -5px; border-width: 2px 0 0 2px; }
+  .sup-photo-wrap::after  { bottom: -5px; right: -5px; border-width: 0 2px 2px 0; }
+
+  /* Scan line on photo */
+  .sup-photo-scan {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: scanDown 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes scanDown { 0%{top:0;opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{top:100%;opacity:0} }
+
+  .sup-role {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--cyan); margin-bottom: 14px;
+  }
+  .sup-name {
+    font-family: 'Bebas Neue', sans-serif; font-size: 30px;
+    letter-spacing: 2px; margin-bottom: 8px;
+  }
+  .sup-dept {
+    font-size: 12px; color: var(--muted); line-height: 1.7;
+  }
+
+  .supervisor-info {
+    padding: 48px 44px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+  }
+  .supervisor-info p {
+    font-size: 15px; line-height: 1.8;
+    color: rgba(242,239,232,0.65);
+    margin-bottom: 20px;
+  }
+  .sup-contact-row {
+    display: flex; gap: 2px; margin-top: 32px; flex-wrap: wrap;
+  }
+  .sup-contact-chip {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    padding: 10px 20px;
+    background: rgba(0,229,255,0.05);
+    border: 1px solid rgba(0,229,255,0.15);
+    color: rgba(242,239,232,0.7);
+    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .sup-contact-chip:hover { background: rgba(0,229,255,0.1); color: var(--cyan); border-color: rgba(0,229,255,0.3); }
+  .sup-contact-chip span { color: var(--cyan); }
+
+  /* ── TEAM GRID ── */
+  .team-section { margin-bottom: 100px; }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+
+  .member-card {
+    border: 1px solid rgba(242,239,232,0.07);
+    background: rgba(242,239,232,0.02);
+    position: relative; overflow: hidden;
+    transition: all .3s;
+    display: flex; flex-direction: column;
+  }
+  .member-card:hover { border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.03); }
+
+  /* Accent top bar — different colour per card */
+  .member-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--cyan);
+    transform: scaleX(0); transform-origin: left; transition: transform .35s;
+  }
+  .member-card:hover::before { transform: scaleX(1); }
+
+  .member-card-top {
+    padding: 32px 28px 24px;
+    border-bottom: 1px solid rgba(242,239,232,0.05);
+    position: relative;
+  }
+
+  .member-avatar {
+    width: 120px; height: 120px;
+    background: rgba(0,229,255,0.08);
+    border: 2px solid rgba(0,229,255,0.25);
+    display: grid; place-items: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px; color: var(--cyan);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    position: relative; z-index: 1;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+
+  .member-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: top center;
+    filter: grayscale(15%) contrast(1.05);
+    transition: filter .35s, transform .35s;
+    display: block;
+  }
+  .member-card:hover .member-avatar img {
+    filter: grayscale(0%) contrast(1.1);
+    transform: scale(1.05);
+  }
+
+  /* Scan line on hover */
+  .member-avatar .avatar-scan {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: scanDown 3s ease-in-out infinite;
+    z-index: 2; pointer-events: none;
+    opacity: 0; transition: opacity .3s;
+  }
+  .member-card:hover .member-avatar .avatar-scan { opacity: 1; }
+  @keyframes scanDown { 0%{top:0;opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{top:100%;opacity:0} }
+
+  /* Online indicator */
+  .member-avatar::after {
+    content: ''; position: absolute; bottom: 6px; right: 6px;
+    width: 12px; height: 12px;
+    background: #00ff88; border-radius: 50%;
+    border: 2px solid var(--ink);
+    animation: statusBlink 2.5s ease-in-out infinite;
+    z-index: 3;
+    box-shadow: 0 0 8px rgba(0,255,136,0.5);
+  }
+  @keyframes statusBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .member-num {
+    position: absolute; top: 28px; right: 24px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 52px;
+    color: rgba(0,229,255,0.06); line-height: 1; pointer-events: none;
+  }
+
+  /* Alias for new structure — same as card-top direct children */
+  .member-card-info { margin-top: 0; }
+
+  .member-num {
+    position: absolute; top: 28px; right: 28px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 52px;
+    color: rgba(0,229,255,0.06); line-height: 1; pointer-events: none;
+  }
+
+  .member-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 4px; }
+  .member-id { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(242,239,232,0.3); margin-bottom: 14px; letter-spacing: 1px; }
+  .member-role {
+    display: inline-block;
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    padding: 4px 12px; letter-spacing: 1px;
+    background: rgba(0,229,255,0.08); color: var(--cyan);
+    border: 1px solid rgba(0,229,255,0.2);
+  }
+
+  .member-card-body { padding: 24px 32px; flex: 1; }
+  .member-card-body p { font-size: 13px; line-height: 1.7; color: rgba(242,239,232,0.5); margin-bottom: 20px; }
+
+  .member-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    padding: 3px 9px; letter-spacing: 1px;
+    border: 1px solid rgba(242,239,232,0.1);
+    color: rgba(242,239,232,0.35);
+  }
+
+  .member-card-foot {
+    padding: 20px 32px;
+    border-top: 1px solid rgba(242,239,232,0.05);
+    display: flex; gap: 12px;
+  }
+  .member-link {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    color: rgba(242,239,232,0.4); text-decoration: none;
+    letter-spacing: 1px; transition: color .2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .member-link:hover { color: var(--cyan); }
+  .member-link span { font-size: 14px; }
+
+  /* ── INSTITUTION ── */
+  .institution-section { margin-bottom: 100px; }
+
+  .inst-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .inst-card {
+    padding: 44px 40px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    position: relative; overflow: hidden;
+    transition: all .3s;
+  }
+  .inst-card:hover { background: rgba(0,229,255,0.03); border-color: rgba(0,229,255,0.2); }
+
+  .inst-icon { font-size: 36px; margin-bottom: 20px; }
+  .inst-card h3 {
+    font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+    letter-spacing: 1px; margin-bottom: 12px;
+  }
+  .inst-card p { font-size: 14px; line-height: 1.7; color: var(--muted); }
+  .inst-detail {
+    margin-top: 24px; padding-top: 24px;
+    border-top: 1px solid rgba(242,239,232,0.07);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .inst-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    color: rgba(242,239,232,0.5); letter-spacing: 1px;
+  }
+  .inst-row-label { color: var(--cyan); min-width: 80px; }
+
+  /* ── ACKNOWLEDGEMENTS ── */
+  .ack-section {
+    padding: 60px 48px;
+    background: rgba(0,229,255,0.03);
+    border: 1px solid rgba(0,229,255,0.12);
+    position: relative; overflow: hidden;
+    margin-bottom: 0;
+  }
+  .ack-section::before {
+    content: '"';
+    position: absolute; right: 40px; top: -20px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 200px;
+    color: rgba(0,229,255,0.05); line-height: 1;
+    pointer-events: none;
+  }
+  .ack-section blockquote {
+    font-size: 18px; line-height: 1.8;
+    color: rgba(242,239,232,0.7);
+    font-style: italic; max-width: 700px;
+    margin-bottom: 28px;
+  }
+  .ack-section blockquote strong { color: var(--paper); font-style: normal; }
+  .ack-sig {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    color: var(--cyan); letter-spacing: 2px;
+  }
+
+  /* ── FOOTER ── */
+  footer { padding: 50px 6%; border-top: 1px solid rgba(242,239,232,0.08); display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 6px; color: var(--cyan); }
+  .footer-text { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(242,239,232,0.3); letter-spacing: 1px; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; color: rgba(242,239,232,0.4); text-decoration: none; transition: color .2s; }
+  .footer-links a:hover { color: var(--cyan); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1000px) {
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .supervisor-wrap { grid-template-columns: 1fr; }
+    .inst-grid { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor">
+  <div class="cursor-ring"></div>
+  <div class="cursor-dot"></div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <a href="../index.html" class="logo">CISS</a>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="domain.html">Domain</a></li>
+    <li><a href="milestones.html">Milestones</a></li>
+    <li><a href="documents.html">Documents</a></li>
+    <li><a href="presentations.html">Presentations</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="header-ghost">ABOUT</div>
+  <div class="page-header-content">
+    <div class="breadcrumb"><a href="../index.html">HOME</a> / ABOUT</div>
+    <h1>THE<br><em>TEAM</em></h1>
+  </div>
+</div>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">SLIIT · 2026</span>
+    <span class="ticker-item">FINAL YEAR PROJECT</span>
+    <span class="ticker-item">BSC HONS IT</span>
+    <span class="ticker-item">FACULTY OF COMPUTING</span>
+    <span class="ticker-item">GROUP RESEARCH</span>
+    <span class="ticker-item">SLIIT · 2026</span>
+    <span class="ticker-item">FINAL YEAR PROJECT</span>
+    <span class="ticker-item">BSC HONS IT</span>
+    <span class="ticker-item">FACULTY OF COMPUTING</span>
+    <span class="ticker-item">GROUP RESEARCH</span>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- Supervisor -->
+  <section style="margin-bottom:100px">
+    <div class="section-label reveal">PROJECT SUPERVISOR</div>
+    <h2 class="section-title reveal">GUIDED BY</h2>
+    <div class="supervisor-wrap">
+      <div class="supervisor-badge reveal">
+        <div class="sup-photo-wrap">
+          <img class="sup-photo" src="../assets/Images//supervisor.jpeg" alt="Supervisor Photo">
+          <div class="sup-photo-scan"></div>
+        </div>
+        <div class="sup-role">// SUPERVISOR</div>
+        <div class="sup-name">Mr. Didula Chamara</div>
+        <div class="sup-dept">Department of Information Technology<br>Faculty of Computing, SLIIT</div>
+      </div>
+      <div class="supervisor-info reveal" style="transition-delay:.1s">
+        <p>
+          This research was conducted under the supervision of Mr. Didula Chamara, whose guidance shaped the technical direction and evaluation methodology of the Criminal Identification Support System. Their expertise in computer vision and information security provided a rigorous framework for the system's design decisions.
+        </p>
+        <p>
+          The project benefited greatly from regular feedback sessions that pushed the team to prioritise real-world operational validity over laboratory-idealised performance — a principle reflected throughout the evaluation strategy.
+        </p>
+        <div class="sup-contact-row">
+          <a class="sup-contact-chip" href="mailto:didula.c@sliit.lk">
+            <span>✉</span> didula.c@sliit.lk
+          </a>
+          <div class="sup-contact-chip">
+            <span>🏛</span> SLIIT, Malabe Campus
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="team-section">
+    <div class="section-label reveal">THE RESEARCHERS</div>
+    <h2 class="section-title reveal">MEET THE<br>TEAM</h2>
+
+    <div class="team-grid">
+
+      <!-- Member 1 -->
+      <div class="member-card reveal">
+        <div class="member-card-top">
+          <div class="member-num">01</div>
+          <div class="member-avatar">AB<div class="avatar-scan"></div></div>
+          <div class="member-name">Your Name Here</div>
+          <div class="member-id">// IT21XXXXXX</div>
+          <div class="member-role">Lead Developer</div>
+        </div>
+        <div class="member-card-body">
+          <p>Responsible for overall system architecture, API design, and pipeline integration across all CISS components.</p>
+          <div class="member-tags">
+            <span class="tag">Python</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">System Design</span>
+          </div>
+        </div>
+        <div class="member-card-foot">
+          <a class="member-link" href="mailto:member1@sliit.lk"><span>✉</span> Email</a>
+          <a class="member-link" href="#"><span>🔗</span> LinkedIn</a>
+        </div>
+      </div>
+
+      <!-- Member 2 -->
+      <div class="member-card reveal" style="transition-delay:.1s">
+        <div class="member-card-top">
+          <div class="member-num">02</div>
+          <div class="member-avatar"><img src="../assets//Images/member2.png" alt="Member 2"><div class="avatar-scan"></div></div>
+          <div class="member-name">Tharaka Lakshan</div>
+          <div class="member-id">// IT22319524</div>
+          <div class="member-role">ML Engineer</div>
+        </div>
+        <div class="member-card-body">
+          <p>Led the YOLOv8 occlusion detection model — dataset collection, labelling, augmentation, and three training iterations to correct the class-label transposition error.</p>
+          <div class="member-tags">
+            <span class="tag">YOLOv8</span>
+            <span class="tag">Computer Vision</span>
+            <span class="tag">Dataset Curation</span>
+          </div>
+        </div>
+        <div class="member-card-foot">
+          <a class="member-link" href="mailto:it22319524@sliit.lk"><span>✉</span> Email</a>
+          <a class="member-link" href="#"><span>🔗</span> LinkedIn</a>
+        </div>
+      </div>
+
+      <!-- Member 3 -->
+      <div class="member-card reveal" style="transition-delay:.2s">
+        <div class="member-card-top">
+          <div class="member-num">03</div>
+          <div class="member-avatar"><img src="../assets//Images/member3.jpeg" alt="Member 3"><div class="avatar-scan"></div></div>
+          <div class="member-name">Senuri Amandi</div>
+          <div class="member-id">// IT22920072</div>
+          <div class="member-role">Blockchain Developer</div>
+        </div>
+        <div class="member-card-body">
+          <p>Designed and deployed the Ethereum smart contracts enforcing criminal registration, identification logging, access control, and duplicate prevention at the EVM level.</p>
+          <div class="member-tags">
+            <span class="tag">Solidity</span>
+            <span class="tag">Ethereum</span>
+            <span class="tag">Web3</span>
+          </div>
+        </div>
+        <div class="member-card-foot">
+          <a class="member-link" href="mailto:it22920072@sliit.lk"><span>✉</span> Email</a>
+          <a class="member-link" href="#"><span>🔗</span> LinkedIn</a>
+        </div>
+      </div>
+
+      <!-- Member 4 -->
+      <div class="member-card reveal" style="transition-delay:.3s">
+        <div class="member-card-top">
+          <div class="member-num">04</div>
+          <div class="member-avatar"><img src="../assets//Images/member4.jpeg" alt="Member 4"><div class="avatar-scan"></div></div>
+          <div class="member-name">Nalinda Ranasinghe</div>
+          <div class="member-id">// IT22331786</div>
+          <div class="member-role">Blockchain Developer</div>
+        </div>
+        <div class="member-card-body">
+          <p>Built the React officer dashboard — enrolment workflow, video submission interface, identification result display, and blockchain audit log viewer.</p>
+          <div class="member-tags">
+            <span class="tag">React</span>
+            <span class="tag">UI/UX</span>
+            <span class="tag">Dashboard</span>
+          </div>
+        </div>
+        <div class="member-card-foot">
+          <a class="member-link" href="mailto:it22331786@sliit.lk"><span>✉</span> Email</a>
+          <a class="member-link" href="#"><span>🔗</span> LinkedIn</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Institution -->
+  <section class="institution-section">
+    <div class="section-label reveal">AFFILIATION</div>
+    <h2 class="section-title reveal">INSTITUTION &<br>DEPARTMENT</h2>
+    <div class="inst-grid">
+      <div class="inst-card reveal">
+        <div class="inst-icon">🏛</div>
+        <h3>SLIIT</h3>
+        <p>Sri Lanka Institute of Information Technology — Sri Lanka's leading IT-focused university, providing world-class education in computing and engineering disciplines.</p>
+        <div class="inst-detail">
+          <div class="inst-row"><span class="inst-row-label">LOCATION</span> Malabe, Western Province, Sri Lanka</div>
+          <div class="inst-row"><span class="inst-row-label">WEBSITE</span> sliit.lk</div>
+          <div class="inst-row"><span class="inst-row-label">ESTD.</span> 1999</div>
+        </div>
+      </div>
+      <div class="inst-card reveal" style="transition-delay:.1s">
+        <div class="inst-icon">💻</div>
+        <h3>Faculty of Computing</h3>
+        <p>The Faculty of Computing at SLIIT houses the Department of Information Technology, where this research was conducted as a Final Year Research Project for the BSc (Hons) in IT programme.</p>
+        <div class="inst-detail">
+          <div class="inst-row"><span class="inst-row-label">DEGREE</span> BSc (Hons) Information Technology</div>
+          <div class="inst-row"><span class="inst-row-label">DEPT.</span> Department of Information Technology</div>
+          <div class="inst-row"><span class="inst-row-label">YEAR</span> 2025 / 2026</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Acknowledgements -->
+  <section>
+    <div class="section-label reveal">ACKNOWLEDGEMENTS</div>
+    <div class="ack-section reveal">
+      <blockquote>
+        We extend our sincere gratitude to our supervisor for their unwavering guidance throughout this research. We also thank the <strong>Faculty of Computing at SLIIT</strong> for providing the academic framework and resources that made this project possible, and our families for their support during the final year of our degree.
+      </blockquote>
+      <div class="ack-sig">— THE CISS RESEARCH TEAM · SLIIT · 2026</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">CISS</div>
+  <div class="footer-text">© 2026 Research Project · SLIIT · All rights reserved</div>
+  <div class="footer-links">
+    <a href="../index.html">Home</a>
+    <a href="domain.html">Domain</a>
+    <a href="documents.html">Documents</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</footer>
+
+<script>
+  const dot = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left = mouseX + 'px'; dot.style.top = mouseY + 'px';
+  });
+  (function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  })();
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISS — Milestones</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f2efe8;
+    --cyan: #00e5ff;
+    --red: #ff2d55;
+    --green: #00ff88;
+    --yellow: #ffd60a;
+    --muted: rgba(242,239,232,0.5);
+    --grid: rgba(0,229,255,0.06);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--ink); color: var(--paper); overflow-x: hidden; cursor: none; }
+
+  /* ── CURSOR ── */
+  .cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; }
+  .cursor-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; transform: translate(-50%,-50%); }
+  .cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(0,229,255,0.4); border-radius: 50%; transform: translate(-50%,-50%); transition: width .2s, height .2s, border-color .2s; position: absolute; top: 0; left: 0; }
+  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 52px; height: 52px; border-color: var(--cyan); }
+
+  body::before { content: ''; position: fixed; inset: 0; z-index: 9990; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 6%;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(0,229,255,0.1);
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 20px rgba(0,229,255,0.5); text-decoration: none; }
+  nav ul { list-style: none; display: flex; gap: 8px; }
+  nav ul li a { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(242,239,232,0.55); text-decoration: none; padding: 7px 14px; border: 1px solid transparent; border-radius: 2px; transition: all .2s; }
+  nav ul li a:hover, nav ul li a.active { color: var(--cyan); border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.05); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    min-height: 44vh; padding: 160px 6% 80px;
+    position: relative; overflow: hidden; display: flex; align-items: flex-end;
+  }
+  .page-header::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px; animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
+  .page-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 160px; background: linear-gradient(transparent, var(--ink)); }
+  .header-ghost { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 14vw, 200px); color: rgba(0,229,255,0.04); letter-spacing: 8px; right: 4%; bottom: -20px; line-height: 1; user-select: none; z-index: 0; }
+  .page-header-content { position: relative; z-index: 2; }
+  .breadcrumb { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: rgba(0,229,255,0.6); margin-bottom: 16px; }
+  .breadcrumb a { color: inherit; text-decoration: none; }
+  .breadcrumb a:hover { color: var(--cyan); }
+  .page-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 8vw, 110px); line-height: 0.9; letter-spacing: 3px; }
+  .page-header h1 em { font-style: normal; color: var(--cyan); }
+
+  /* ── TICKER ── */
+  .ticker { background: var(--cyan); color: var(--ink); padding: 10px 0; overflow: hidden; }
+  .ticker-inner { display: flex; animation: tickerScroll 30s linear infinite; white-space: nowrap; }
+  .ticker-item { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 0 40px; flex-shrink: 0; }
+  .ticker-item::before { content: '◆'; margin-right: 40px; opacity: 0.5; }
+  @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ── MAIN ── */
+  .main { padding: 90px 6% 120px; }
+  .section-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,229,255,0.4), transparent); }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 4vw, 60px); letter-spacing: 2px; margin-bottom: 56px; line-height: 1; }
+
+  /* ── PROGRESS SUMMARY BAR ── */
+  .progress-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-bottom: 80px;
+  }
+  .prog-tile {
+    padding: 28px 28px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    text-align: center;
+    transition: all .3s;
+  }
+  .prog-tile:hover { background: rgba(0,229,255,0.03); border-color: rgba(0,229,255,0.2); }
+  .prog-tile-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 52px;
+    line-height: 1; letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .prog-tile-num.c-green { color: var(--green); }
+  .prog-tile-num.c-yellow { color: var(--yellow); }
+  .prog-tile-num.c-cyan { color: var(--cyan); }
+  .prog-tile-num.c-red { color: var(--red); }
+  .prog-tile-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: rgba(242,239,232,0.4); }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; margin-bottom: 100px; }
+
+  /* Vertical spine */
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 220px; top: 0; bottom: 0; width: 1px;
+    background: linear-gradient(180deg, transparent, rgba(0,229,255,0.25) 5%, rgba(0,229,255,0.25) 95%, transparent);
+  }
+
+  .milestone-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0;
+    position: relative;
+    margin-bottom: 2px;
+  }
+
+  /* ── DATE COLUMN ── */
+  .milestone-date-col {
+    padding: 36px 40px 36px 0;
+    text-align: right;
+    position: relative;
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-end;
+  }
+
+  /* Dot on spine */
+  .milestone-date-col::after {
+    content: '';
+    position: absolute; right: -6px; top: 50%;
+    transform: translateY(-50%);
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: var(--cyan);
+    z-index: 2;
+    transition: box-shadow .3s;
+  }
+  .milestone-row:hover .milestone-date-col::after {
+    box-shadow: 0 0 0 4px rgba(0,229,255,0.2), 0 0 16px rgba(0,229,255,0.4);
+  }
+  .milestone-row.status-done .milestone-date-col::after { background: var(--green); }
+  .milestone-row.status-active .milestone-date-col::after {
+    background: var(--yellow);
+    animation: pulseDot 1.8s ease-in-out infinite;
+  }
+  .milestone-row.status-upcoming .milestone-date-col::after { background: rgba(242,239,232,0.2); border-color: rgba(242,239,232,0.15); }
+
+  @keyframes pulseDot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,214,10,0.6); }
+    50%       { box-shadow: 0 0 0 8px rgba(255,214,10,0); }
+  }
+
+  .ms-date {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 1px; color: rgba(242,239,232,0.4);
+    margin-bottom: 4px;
+  }
+  .ms-sprint {
+    font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+    letter-spacing: 2px; color: rgba(242,239,232,0.2);
+  }
+
+  /* ── CARD COLUMN ── */
+  .milestone-card {
+    margin: 8px 0 8px 40px;
+    padding: 32px 36px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    position: relative; overflow: hidden;
+    transition: all .3s;
+  }
+  .milestone-card::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    background: var(--cyan);
+    transform: scaleY(0); transform-origin: top; transition: transform .35s;
+  }
+  .milestone-row:hover .milestone-card { border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.02); }
+  .milestone-row:hover .milestone-card::before { transform: scaleY(1); }
+
+  .milestone-row.status-done .milestone-card::before { background: var(--green); }
+  .milestone-row.status-active .milestone-card::before { background: var(--yellow); transform: scaleY(1); }
+  .milestone-row.status-upcoming .milestone-card::before { background: rgba(242,239,232,0.15); }
+
+  .ms-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 16px; flex-wrap: wrap; }
+
+  .ms-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; line-height: 1; }
+
+  .ms-status-badge {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; padding: 5px 12px;
+    border: 1px solid; flex-shrink: 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .badge-done    { color: var(--green);  border-color: rgba(0,255,136,0.3);  background: rgba(0,255,136,0.06); }
+  .badge-active  { color: var(--yellow); border-color: rgba(255,214,10,0.3); background: rgba(255,214,10,0.06); }
+  .badge-upcoming{ color: rgba(242,239,232,0.3); border-color: rgba(242,239,232,0.1); background: transparent; }
+
+  .ms-desc { font-size: 13px; line-height: 1.7; color: rgba(242,239,232,0.5); margin-bottom: 20px; }
+
+  .ms-deliverables { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .ms-deliverable {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    padding: 4px 10px; letter-spacing: 1px;
+    border: 1px solid rgba(242,239,232,0.1);
+    color: rgba(242,239,232,0.35);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ms-deliverable.done-item { border-color: rgba(0,255,136,0.2); color: rgba(0,255,136,0.6); }
+  .ms-deliverable.done-item::before { content: '✓'; }
+  .ms-deliverable.pending-item::before { content: '○'; color: rgba(242,239,232,0.2); }
+
+  /* Progress bar inside card */
+  .ms-progress-wrap { margin-top: 8px; }
+  .ms-progress-label {
+    display: flex; justify-content: space-between;
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; color: rgba(242,239,232,0.3);
+    margin-bottom: 6px;
+  }
+  .ms-progress-track {
+    height: 3px; background: rgba(242,239,232,0.08);
+    position: relative; overflow: hidden;
+  }
+  .ms-progress-fill {
+    height: 100%; position: absolute; left: 0; top: 0;
+    background: var(--cyan);
+    transition: width 1.2s cubic-bezier(.22,1,.36,1);
+  }
+  .ms-progress-fill.fill-green  { background: var(--green); }
+  .ms-progress-fill.fill-yellow { background: var(--yellow); }
+  .ms-progress-fill.fill-muted  { background: rgba(242,239,232,0.15); }
+
+  /* Ghost number */
+  .ms-ghost {
+    position: absolute; right: 16px; bottom: -12px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 80px;
+    color: rgba(0,229,255,0.04); line-height: 1; pointer-events: none;
+  }
+
+  /* ── MARKS SUMMARY TABLE ── */
+  .marks-section { margin-bottom: 100px; }
+  .marks-table-wrap {
+    border: 1px solid rgba(242,239,232,0.07);
+    overflow: hidden;
+  }
+  table.marks-table { width: 100%; border-collapse: collapse; }
+  .marks-table thead tr {
+    background: rgba(0,229,255,0.06);
+    border-bottom: 1px solid rgba(0,229,255,0.15);
+  }
+  .marks-table th {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--cyan);
+    padding: 16px 24px; text-align: left; font-weight: 400;
+  }
+  .marks-table td {
+    padding: 16px 24px; font-size: 13px;
+    color: rgba(242,239,232,0.6); line-height: 1.5;
+    border-bottom: 1px solid rgba(242,239,232,0.05);
+  }
+  .marks-table tbody tr:last-child td { border-bottom: none; }
+  .marks-table tbody tr:hover td { background: rgba(0,229,255,0.02); color: var(--paper); }
+  .marks-table td:first-child { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--paper); }
+  .marks-table td.weight {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    color: var(--cyan); font-weight: 700;
+  }
+  .marks-table tfoot tr { background: rgba(0,0,0,0.3); border-top: 1px solid rgba(0,229,255,0.15); }
+  .marks-table tfoot td { color: var(--paper); font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; }
+  .marks-table tfoot td.weight { color: var(--cyan); font-size: 22px; }
+
+  /* ── FOOTER ── */
+  footer { padding: 50px 6%; border-top: 1px solid rgba(242,239,232,0.08); display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 6px; color: var(--cyan); }
+  .footer-text { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(242,239,232,0.3); letter-spacing: 1px; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; color: rgba(242,239,232,0.4); text-decoration: none; transition: color .2s; }
+  .footer-links a:hover { color: var(--cyan); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* Stagger children of timeline */
+  .milestone-row { opacity: 0; transform: translateX(-20px); transition: opacity .6s ease, transform .6s ease; }
+  .milestone-row.in-view { opacity: 1; transform: translateX(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .progress-summary { grid-template-columns: repeat(2, 1fr); }
+    .timeline::before { left: 0; }
+    .milestone-row { grid-template-columns: 1fr; }
+    .milestone-date-col { text-align: left; padding: 16px 0 0 28px; flex-direction: row; align-items: center; gap: 12px; }
+    .milestone-date-col::after { left: 0; right: auto; }
+    .milestone-card { margin: 0 0 0 0; }
+  }
+  @media (max-width: 768px) {
+    nav ul { display: none; }
+    .progress-summary { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor">
+  <div class="cursor-ring"></div>
+  <div class="cursor-dot"></div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <a href="../index.html" class="logo">CISS</a>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="domain.html">Domain</a></li>
+    <li><a href="milestones.html" class="active">Milestones</a></li>
+    <li><a href="documents.html">Documents</a></li>
+    <li><a href="presentations.html">Presentations</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="header-ghost">MILESTONES</div>
+  <div class="page-header-content">
+    <div class="breadcrumb"><a href="../index.html">HOME</a> / MILESTONES</div>
+    <h1>PROJECT<br><em>MILESTONES</em></h1>
+  </div>
+</div>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">PROPOSAL DEFENCE</span>
+    <span class="ticker-item">PROGRESS REVIEW 1</span>
+    <span class="ticker-item">PROGRESS REVIEW 2</span>
+    <span class="ticker-item">FINAL VIVA</span>
+    <span class="ticker-item">SLIIT · 2026</span>
+    <span class="ticker-item">PROPOSAL DEFENCE</span>
+    <span class="ticker-item">PROGRESS REVIEW 1</span>
+    <span class="ticker-item">PROGRESS REVIEW 2</span>
+    <span class="ticker-item">FINAL VIVA</span>
+    <span class="ticker-item">SLIIT · 2026</span>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- Progress Summary -->
+  <section style="margin-bottom: 80px;">
+    <div class="section-label reveal">OVERVIEW</div>
+    <h2 class="section-title reveal">PROJECT<br>PROGRESS</h2>
+
+    <div class="progress-summary reveal">
+      <div class="prog-tile">
+        <div class="prog-tile-num c-green">02</div>
+        <div class="prog-tile-label">COMPLETED</div>
+      </div>
+      <div class="prog-tile">
+        <div class="prog-tile-num c-yellow">01</div>
+        <div class="prog-tile-label">IN PROGRESS</div>
+      </div>
+      <div class="prog-tile">
+        <div class="prog-tile-num c-cyan">01</div>
+        <div class="prog-tile-label">UPCOMING</div>
+      </div>
+      <div class="prog-tile">
+        <div class="prog-tile-num c-red">04</div>
+        <div class="prog-tile-label">TOTAL MILESTONES</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline -->
+  <section style="margin-bottom: 100px;">
+    <div class="section-label reveal">TIMELINE</div>
+    <h2 class="section-title reveal">RESEARCH<br>TIMELINE</h2>
+
+    <div class="timeline">
+
+      <!-- M1: Proposal Defence -->
+      <div class="milestone-row status-done">
+        <div class="milestone-date-col">
+          <div class="ms-date">MAY 2025</div>
+          <div class="ms-sprint">M — 01</div>
+        </div>
+        <div class="milestone-card">
+          <div class="ms-ghost">01</div>
+          <div class="ms-card-top">
+            <div class="ms-title">Proposal Defence</div>
+            <div class="ms-status-badge badge-done">● COMPLETED</div>
+          </div>
+          <div class="ms-desc">
+            Presented the initial research proposal to the evaluation panel, covering the problem domain, proposed CISS architecture, objectives, scope, and project timeline. Received approval to proceed to implementation.
+          </div>
+          <div class="ms-deliverables">
+            <span class="ms-deliverable done-item">Proposal Report</span>
+            <span class="ms-deliverable done-item">Proposal Slides</span>
+            <span class="ms-deliverable done-item">Topic Approval</span>
+            <span class="ms-deliverable done-item">Panel Feedback</span>
+          </div>
+          <div class="ms-progress-wrap">
+            <div class="ms-progress-label"><span>// COMPLETION</span><span>100%</span></div>
+            <div class="ms-progress-track">
+              <div class="ms-progress-fill fill-green" style="width:100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M2: Progress Review 1 -->
+      <div class="milestone-row status-done">
+        <div class="milestone-date-col">
+          <div class="ms-date">AUG 2025</div>
+          <div class="ms-sprint">M — 02</div>
+        </div>
+        <div class="milestone-card">
+          <div class="ms-ghost">02</div>
+          <div class="ms-card-top">
+            <div class="ms-title">Progress Review 01</div>
+            <div class="ms-status-badge badge-done">● COMPLETED</div>
+          </div>
+          <div class="ms-desc">
+            Demonstrated early-stage implementation including the YOLOv8 occlusion detection model prototype, initial Ethereum smart contract deployment on a test network, and the facial recognition pipeline baseline. Presented a revised project plan following supervisor feedback.
+          </div>
+          <div class="ms-deliverables">
+            <span class="ms-deliverable done-item">Progress Report</span>
+            <span class="ms-deliverable done-item">Model Prototype</span>
+            <span class="ms-deliverable done-item">Smart Contract v1</span>
+            <span class="ms-deliverable done-item">Status Slides</span>
+          </div>
+          <div class="ms-progress-wrap">
+            <div class="ms-progress-label"><span>// COMPLETION</span><span>100%</span></div>
+            <div class="ms-progress-track">
+              <div class="ms-progress-fill fill-green" style="width:100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M3: Progress Review 2 -->
+      <div class="milestone-row status-active">
+        <div class="milestone-date-col">
+          <div class="ms-date">DEC 2025</div>
+          <div class="ms-sprint">M — 03</div>
+        </div>
+        <div class="milestone-card">
+          <div class="ms-ghost">03</div>
+          <div class="ms-card-top">
+            <div class="ms-title">Progress Review 02</div>
+            <div class="ms-status-badge badge-active">◉ IN PROGRESS</div>
+          </div>
+          <div class="ms-desc">
+            Presenting the near-complete CISS system with all four sub-components integrated — occlusion detection, face recognition, blockchain audit, and officer dashboard. Evaluation of system-level performance metrics and end-to-end pipeline testing.
+          </div>
+          <div class="ms-deliverables">
+            <span class="ms-deliverable done-item">Integration Report</span>
+            <span class="ms-deliverable done-item">System Demo</span>
+            <span class="ms-deliverable pending-item">Evaluation Results</span>
+            <span class="ms-deliverable pending-item">Updated Slides</span>
+          </div>
+          <div class="ms-progress-wrap">
+            <div class="ms-progress-label"><span>// COMPLETION</span><span>60%</span></div>
+            <div class="ms-progress-track">
+              <div class="ms-progress-fill fill-yellow" style="width:60%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- M4: Final Viva -->
+      <div class="milestone-row status-upcoming">
+        <div class="milestone-date-col">
+          <div class="ms-date">MAR 2026</div>
+          <div class="ms-sprint">M — 04</div>
+        </div>
+        <div class="milestone-card">
+          <div class="ms-ghost">04</div>
+          <div class="ms-card-top">
+            <div class="ms-title">Final Viva & Submission</div>
+            <div class="ms-status-badge badge-upcoming">○ UPCOMING</div>
+          </div>
+          <div class="ms-desc">
+            Final oral examination and submission of the completed CISS research project. Presentation of all findings, system demonstration, and defence of methodology and results to the examination board.
+          </div>
+          <div class="ms-deliverables">
+            <span class="ms-deliverable pending-item">Final Report</span>
+            <span class="ms-deliverable pending-item">Final Slides</span>
+            <span class="ms-deliverable pending-item">System Submission</span>
+            <span class="ms-deliverable pending-item">Viva Defence</span>
+          </div>
+          <div class="ms-progress-wrap">
+            <div class="ms-progress-label"><span>// COMPLETION</span><span>0%</span></div>
+            <div class="ms-progress-track">
+              <div class="ms-progress-fill fill-muted" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Marks Breakdown -->
+  <section class="marks-section">
+    <div class="section-label reveal">ASSESSMENT</div>
+    <h2 class="section-title reveal">MARKS<br>BREAKDOWN</h2>
+    <div class="marks-table-wrap reveal">
+      <table class="marks-table">
+        <thead>
+          <tr>
+            <th>ASSESSMENT</th>
+            <th>DESCRIPTION</th>
+            <th>WEIGHTING</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Proposal Defence</td>
+            <td>Initial presentation of research topic, scope, and methodology</td>
+            <td class="weight">10%</td>
+          </tr>
+          <tr>
+            <td>Progress Review 01</td>
+            <td>Demonstration of early implementation and component prototypes</td>
+            <td class="weight">15%</td>
+          </tr>
+          <tr>
+            <td>Progress Review 02</td>
+            <td>Integrated system demonstration with evaluation results</td>
+            <td class="weight">25%</td>
+          </tr>
+          <tr>
+            <td>Final Viva</td>
+            <td>Oral defence of the completed research project</td>
+            <td class="weight">20%</td>
+          </tr>
+          <tr>
+            <td>Final Report</td>
+            <td>Written research report covering all components and findings</td>
+            <td class="weight">30%</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Total</td>
+            <td>BSc (Hons) IT Final Year Research Project</td>
+            <td class="weight">100%</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">CISS</div>
+  <div class="footer-text">© 2026 Research Project · SLIIT · All rights reserved</div>
+  <div class="footer-links">
+    <a href="../index.html">Home</a>
+    <a href="domain.html">Domain</a>
+    <a href="documents.html">Documents</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</footer>
+
+<script>
+  /* ── Cursor ── */
+  const dot  = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left = mouseX + 'px'; dot.style.top = mouseY + 'px';
+  });
+  (function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  })();
+
+  /* ── Scroll reveal ── */
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal, .milestone-row').forEach(el => observer.observe(el));
+
+  /* ── Animate progress bars when they enter view ── */
+  const fills = document.querySelectorAll('.ms-progress-fill');
+  const barObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const target = e.target.dataset.width;
+        e.target.style.width = target;
+        barObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  fills.forEach(fill => {
+    const w = fill.style.width;
+    fill.dataset.width = w;
+    fill.style.width = '0%';
+    barObserver.observe(fill);
+  });
+
+  /* Stagger milestone rows */
+  document.querySelectorAll('.milestone-row').forEach((row, i) => {
+    row.style.transitionDelay = (i * 0.12) + 's';
+  });
+</script>
+</body>
+</html>

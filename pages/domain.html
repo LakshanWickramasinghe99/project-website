@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISS — Domain</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f2efe8;
+    --cyan: #00e5ff;
+    --red: #ff2d55;
+    --muted: rgba(242,239,232,0.5);
+    --grid: rgba(0,229,255,0.06);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--ink); color: var(--paper); overflow-x: hidden; cursor: none; }
+
+  /* ── CURSOR ── */
+  .cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; }
+  .cursor-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; transform: translate(-50%,-50%); }
+  .cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(0,229,255,0.4); border-radius: 50%; transform: translate(-50%,-50%); transition: width .2s, height .2s, border-color .2s; position: absolute; top: 0; left: 0; }
+  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 52px; height: 52px; border-color: var(--cyan); }
+  body::before { content: ''; position: fixed; inset: 0; z-index: 9990; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 6%;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(0,229,255,0.1);
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 20px rgba(0,229,255,0.5); text-decoration: none; }
+  nav ul { list-style: none; display: flex; gap: 8px; }
+  nav ul li a { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(242,239,232,0.55); text-decoration: none; padding: 7px 14px; border: 1px solid transparent; border-radius: 2px; transition: all .2s; }
+  nav ul li a:hover, nav ul li a.active { color: var(--cyan); border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.05); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    min-height: 44vh; padding: 160px 6% 80px;
+    position: relative; overflow: hidden; display: flex; align-items: flex-end;
+  }
+  .page-header::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px; animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
+  .page-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 160px; background: linear-gradient(transparent, var(--ink)); }
+  .header-ghost { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 14vw, 200px); color: rgba(0,229,255,0.04); letter-spacing: 8px; right: 4%; bottom: -20px; line-height: 1; user-select: none; z-index: 0; }
+  .page-header-content { position: relative; z-index: 2; }
+  .breadcrumb { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: rgba(0,229,255,0.6); margin-bottom: 16px; }
+  .breadcrumb a { color: inherit; text-decoration: none; }
+  .breadcrumb a:hover { color: var(--cyan); }
+  .page-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 8vw, 110px); line-height: 0.9; letter-spacing: 3px; }
+  .page-header h1 em { font-style: normal; color: var(--cyan); }
+
+  /* ── TICKER ── */
+  .ticker { background: var(--cyan); color: var(--ink); padding: 10px 0; overflow: hidden; }
+  .ticker-inner { display: flex; animation: tickerScroll 30s linear infinite; white-space: nowrap; }
+  .ticker-item { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 0 40px; flex-shrink: 0; }
+  .ticker-item::before { content: '◆'; margin-right: 40px; opacity: 0.5; }
+  @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ── LAYOUT ── */
+  .main { padding: 90px 6% 120px; }
+  .section-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,229,255,0.4), transparent); }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 4vw, 60px); letter-spacing: 2px; margin-bottom: 40px; line-height: 1; }
+  .domain-section { margin-bottom: 100px; }
+
+  /* ── LITERATURE SURVEY ── */
+  .survey-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 24px;
+  }
+  .survey-intro {
+    grid-column: 1 / -1;
+    padding: 36px 40px;
+    background: rgba(0,229,255,0.03);
+    border: 1px solid rgba(0,229,255,0.12);
+    font-size: 15px; line-height: 1.8;
+    color: rgba(242,239,232,0.65);
+  }
+  .survey-intro strong { color: var(--paper); }
+
+  .survey-card {
+    padding: 36px 36px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    position: relative; overflow: hidden;
+    transition: all .3s;
+  }
+  .survey-card:hover { border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.03); }
+  .survey-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--cyan); transform: scaleX(0); transform-origin: left; transition: transform .35s;
+  }
+  .survey-card:hover::before { transform: scaleX(1); }
+
+  .survey-card-label {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--cyan); margin-bottom: 14px;
+  }
+  .survey-card h4 {
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+    letter-spacing: 1px; margin-bottom: 16px;
+  }
+  .survey-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .survey-list li {
+    font-size: 13px; line-height: 1.6; color: rgba(242,239,232,0.55);
+    padding-left: 18px; position: relative;
+  }
+  .survey-list li::before {
+    content: '▸'; position: absolute; left: 0;
+    color: var(--cyan); font-size: 10px; top: 3px;
+  }
+  .survey-list li strong { color: var(--paper); font-weight: 500; }
+
+  /* Limitation card — red accent */
+  .survey-card.limitations::before { background: var(--red); }
+  .survey-card.limitations .survey-card-label { color: var(--red); }
+  .survey-card.limitations .survey-list li::before { color: var(--red); }
+
+  /* ── RESEARCH GAP ── */
+  .gap-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .gap-card {
+    padding: 32px 28px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    position: relative; overflow: hidden;
+    transition: all .3s;
+  }
+  .gap-card:hover { border-color: rgba(255,45,85,0.25); background: rgba(255,45,85,0.03); }
+  .gap-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 48px;
+    color: rgba(255,45,85,0.12); line-height: 1;
+    position: absolute; top: 16px; right: 16px;
+  }
+  .gap-icon { font-size: 26px; margin-bottom: 16px; }
+  .gap-card p { font-size: 13px; line-height: 1.7; color: rgba(242,239,232,0.55); position: relative; z-index: 1; }
+  .gap-card p strong { color: var(--red); font-weight: 500; }
+
+  /* ── RESEARCH PROBLEM ── */
+  .problem-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1.8fr;
+    gap: 2px;
+  }
+  .problem-badge {
+    padding: 48px 40px;
+    background: rgba(255,45,85,0.04);
+    border: 1px solid rgba(255,45,85,0.2);
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .problem-badge::before {
+    content: '!';
+    position: absolute; right: -10px; bottom: -20px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 180px;
+    color: rgba(255,45,85,0.06); line-height: 1; pointer-events: none;
+  }
+  .problem-badge-label {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; color: var(--red); margin-bottom: 16px;
+  }
+  .problem-badge h3 {
+    font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+    letter-spacing: 2px; line-height: 1.1;
+  }
+  .problem-issues {
+    padding: 40px 44px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+  }
+  .problem-issues ul { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .problem-issues ul li {
+    font-size: 14px; line-height: 1.6; color: rgba(242,239,232,0.6);
+    padding-left: 20px; position: relative;
+  }
+  .problem-issues ul li::before { content: '✕'; position: absolute; left: 0; color: var(--red); font-size: 11px; top: 3px; }
+  .problem-statement {
+    padding: 24px 28px;
+    background: rgba(255,45,85,0.05);
+    border: 1px solid rgba(255,45,85,0.2);
+    border-left: 3px solid var(--red);
+  }
+  .problem-statement p {
+    font-size: 14px; line-height: 1.7;
+    color: rgba(242,239,232,0.75); font-style: italic;
+  }
+  .problem-statement p strong { color: var(--paper); font-style: normal; }
+
+  /* ── OBJECTIVES ── */
+  .obj-wrap {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2px;
+  }
+  .obj-main {
+    padding: 48px 40px;
+    background: rgba(0,229,255,0.04);
+    border: 1px solid rgba(0,229,255,0.18);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .obj-main::before {
+    content: '🎯';
+    position: absolute; right: 20px; bottom: 20px;
+    font-size: 80px; opacity: 0.12;
+    pointer-events: none;
+  }
+  .obj-main-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--cyan); margin-bottom: 14px; }
+  .obj-main h4 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 16px; line-height: 1.2; }
+  .obj-main ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .obj-main ul li { font-size: 13px; color: rgba(242,239,232,0.6); padding-left: 18px; position: relative; line-height: 1.5; }
+  .obj-main ul li::before { content: '▸'; position: absolute; left: 0; color: var(--cyan); font-size: 10px; top: 3px; }
+
+  .obj-specific {
+    padding: 40px 44px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+  }
+  .obj-specific-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--cyan); margin-bottom: 20px; }
+  .obj-items { display: flex; flex-direction: column; gap: 10px; }
+  .obj-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(242,239,232,0.06);
+    transition: all .25s;
+  }
+  .obj-item:hover { border-color: rgba(0,229,255,0.18); background: rgba(0,229,255,0.03); }
+  .obj-item-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    color: var(--cyan); line-height: 1; flex-shrink: 0; min-width: 28px;
+  }
+  .obj-item-text { font-size: 13px; line-height: 1.6; color: rgba(242,239,232,0.6); padding-top: 2px; }
+
+  /* ── METHODOLOGY ── */
+  .method-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .method-step {
+    padding: 36px 32px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    position: relative; overflow: hidden;
+    transition: all .3s;
+  }
+  .method-step:hover { border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.03); }
+  .method-step::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--cyan); transform: scaleX(0); transform-origin: left; transition: transform .35s;
+  }
+  .method-step:hover::before { transform: scaleX(1); }
+  .method-step-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 60px;
+    color: rgba(0,229,255,0.06); line-height: 1;
+    position: absolute; top: 12px; right: 16px;
+  }
+  .method-icon { font-size: 28px; margin-bottom: 16px; }
+  .method-step h4 {
+    font-family: 'Bebas Neue', sans-serif; font-size: 20px;
+    letter-spacing: 1px; margin-bottom: 10px;
+  }
+  .method-step p { font-size: 13px; line-height: 1.7; color: rgba(242,239,232,0.5); }
+  .method-step .method-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
+  .method-tag {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    padding: 3px 9px; letter-spacing: 1px;
+    border: 1px solid rgba(0,229,255,0.15);
+    color: rgba(0,229,255,0.5);
+  }
+
+  /* ── TECH STACK ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+  }
+  .tech-col {
+    padding: 32px 28px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    transition: all .3s;
+  }
+  .tech-col:hover { border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.03); }
+  .tech-col-icon { font-size: 26px; margin-bottom: 14px; }
+  .tech-col-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 16px;
+    letter-spacing: 1px; margin-bottom: 14px; color: var(--cyan);
+  }
+  .tech-items { display: flex; flex-direction: column; gap: 7px; }
+  .tech-item {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 1px; color: rgba(242,239,232,0.5);
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(242,239,232,0.06);
+    transition: all .2s;
+  }
+  .tech-item:hover { color: var(--cyan); border-color: rgba(0,229,255,0.2); }
+
+  /* ── FOOTER ── */
+  footer { padding: 50px 6%; border-top: 1px solid rgba(242,239,232,0.08); display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 6px; color: var(--cyan); }
+  .footer-text { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(242,239,232,0.3); letter-spacing: 1px; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; color: rgba(242,239,232,0.4); text-decoration: none; transition: color .2s; }
+  .footer-links a:hover { color: var(--cyan); }
+
+  /* ── REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .tech-grid { grid-template-columns: repeat(3, 1fr); }
+    .gap-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 900px) {
+    .survey-grid { grid-template-columns: 1fr; }
+    .problem-wrap, .obj-wrap { grid-template-columns: 1fr; }
+    .method-steps { grid-template-columns: repeat(2, 1fr); }
+    .tech-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    nav ul { display: none; }
+    .gap-grid { grid-template-columns: 1fr; }
+    .method-steps { grid-template-columns: 1fr; }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor">
+  <div class="cursor-ring"></div>
+  <div class="cursor-dot"></div>
+</div>
+
+<nav>
+  <a href="../index.html" class="logo">CISS</a>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="domain.html" class="active">Domain</a></li>
+    <li><a href="milestones.html">Milestones</a></li>
+    <li><a href="documents.html">Documents</a></li>
+    <li><a href="presentations.html">Presentations</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="header-ghost">DOMAIN</div>
+  <div class="page-header-content">
+    <div class="breadcrumb"><a href="../index.html">HOME</a> / DOMAIN</div>
+    <h1>RESEARCH<br><em>DOMAIN</em></h1>
+  </div>
+</div>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">LITERATURE SURVEY</span>
+    <span class="ticker-item">RESEARCH GAP</span>
+    <span class="ticker-item">OBJECTIVES</span>
+    <span class="ticker-item">METHODOLOGY</span>
+    <span class="ticker-item">TECH STACK</span>
+    <span class="ticker-item">LITERATURE SURVEY</span>
+    <span class="ticker-item">RESEARCH GAP</span>
+    <span class="ticker-item">OBJECTIVES</span>
+    <span class="ticker-item">METHODOLOGY</span>
+    <span class="ticker-item">TECH STACK</span>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- ── LITERATURE SURVEY ── -->
+  <section class="domain-section">
+    <div class="section-label reveal">01 / 05</div>
+    <h2 class="section-title reveal">LITERATURE<br>SURVEY</h2>
+
+    <div class="survey-grid">
+      <div class="survey-intro reveal">
+        Modern research in public safety systems focuses on <strong>Artificial Intelligence (AI)</strong>, <strong>Computer Vision</strong>, and <strong>Audio Analysis</strong> to automate surveillance and detection tasks. Previous systems have explored a range of technologies — from YOLO-based detection to multimodal fusion — each contributing to the foundation CISS builds upon.
+      </div>
+
+      <div class="survey-card reveal">
+        <div class="survey-card-label">// EXISTING APPROACHES</div>
+        <h4>What Systems Have Used</h4>
+        <ul class="survey-list">
+          <li><strong>YOLO-based object detection</strong> for identifying fire, smoke, weapons, and abnormal activities</li>
+          <li><strong>ArcFace and FaceNet</strong> face recognition models for criminal identification</li>
+          <li><strong>Audio classification models</strong> to detect events like gunshots and accidents</li>
+          <li><strong>Multimodal systems</strong> combining video and audio to improve accuracy</li>
+        </ul>
+      </div>
+
+      <div class="survey-card limitations reveal" style="transition-delay:.1s">
+        <div class="survey-card-label">// LIMITATIONS OBSERVED</div>
+        <h4>Where Existing Systems Fall Short</h4>
+        <ul class="survey-list">
+          <li>Focus on a <strong>single modality</strong> — only video or only audio</li>
+          <li>Depend heavily on <strong>manual monitoring</strong></li>
+          <li>Lack <strong>secure data storage mechanisms</strong></li>
+          <li>Studies confirm that combining multiple technologies improves both detection accuracy and system reliability</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RESEARCH GAP ── -->
+  <section class="domain-section">
+    <div class="section-label reveal">02 / 05</div>
+    <h2 class="section-title reveal">RESEARCH<br>GAP</h2>
+
+    <div class="gap-grid">
+      <div class="gap-card reveal">
+        <div class="gap-num">01</div>
+        <div class="gap-icon">🔓</div>
+        <p><strong>Insecure centralised databases</strong> — most systems store criminal records in centralised systems with no tamper-proof guarantees.</p>
+      </div>
+      <div class="gap-card reveal" style="transition-delay:.08s">
+        <div class="gap-num">02</div>
+        <div class="gap-icon">😷</div>
+        <p><strong>Occlusion & masking</strong> — masked or partially visible faces significantly reduce recognition accuracy in existing models.</p>
+      </div>
+      <div class="gap-card reveal" style="transition-delay:.16s">
+        <div class="gap-num">03</div>
+        <div class="gap-icon">📷</div>
+        <p><strong>Real-time CCTV dependency</strong> — many systems rely on live CCTV feeds, which are expensive and not universally available.</p>
+      </div>
+      <div class="gap-card reveal" style="transition-delay:.24s">
+        <div class="gap-num">04</div>
+        <div class="gap-icon">🔁</div>
+        <p><strong>No multi-frame verification</strong> — single-frame analysis leads to high false-positive rates with no cross-frame confirmation.</p>
+      </div>
+      <div class="gap-card reveal" style="transition-delay:.32s">
+        <div class="gap-num">05</div>
+        <div class="gap-icon">🔗</div>
+        <p><strong>No AI + Blockchain integration</strong> — no existing solution properly unifies AI-based detection with blockchain-backed secure storage.</p>
+      </div>
+      <div class="gap-card reveal" style="transition-delay:.40s">
+        <div class="gap-num">06</div>
+        <div class="gap-icon">🇱🇰</div>
+        <p><strong>Sri Lankan context ignored</strong> — limited solutions are designed specifically for the operational conditions and needs of Sri Lanka.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RESEARCH PROBLEM ── -->
+  <section class="domain-section">
+    <div class="section-label reveal">03 / 05</div>
+    <h2 class="section-title reveal">RESEARCH<br>PROBLEM</h2>
+
+    <div class="problem-wrap">
+      <div class="problem-badge reveal">
+        <div class="problem-badge-label">// PROBLEM STATEMENT</div>
+        <h3>Current Systems In Sri Lanka Face Critical Challenges</h3>
+      </div>
+      <div class="problem-issues reveal" style="transition-delay:.1s">
+        <ul>
+          <li>Manual video analysis is <strong>time-consuming and inefficient</strong></li>
+          <li>AI models struggle with <strong>low-quality or occluded images</strong></li>
+          <li>Criminal records in centralised systems are <strong>vulnerable to hacking</strong></li>
+          <li>No unified system exists to <strong>process uploaded videos and evidence</strong></li>
+        </ul>
+        <div class="problem-statement">
+          <p>Therefore, the core problem is: <strong>the lack of a secure, intelligent, and practical system to automatically analyse video/audio data, identify threats or suspects, and store results in a tamper-proof way.</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── OBJECTIVES ── -->
+  <section class="domain-section">
+    <div class="section-label reveal">04 / 05</div>
+    <h2 class="section-title reveal">RESEARCH<br>OBJECTIVES</h2>
+
+    <div class="obj-wrap">
+      <div class="obj-main reveal">
+        <div class="obj-main-label">// MAIN OBJECTIVE</div>
+        <h4>To Develop An AI-Powered Public Safety System That Can:</h4>
+        <ul>
+          <li>Detect emergency events in real time</li>
+          <li>Identify suspects from video and audio</li>
+          <li>Store all records securely using blockchain</li>
+        </ul>
+      </div>
+      <div class="obj-specific reveal" style="transition-delay:.1s">
+        <div class="obj-specific-label">// SPECIFIC OBJECTIVES</div>
+        <div class="obj-items">
+          <div class="obj-item">
+            <div class="obj-item-num">01</div>
+            <div class="obj-item-text">Develop AI models for detection — YOLO, CNN, and related architectures</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">02</div>
+            <div class="obj-item-text">Implement a robust face recognition system with occlusion handling</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">03</div>
+            <div class="obj-item-text">Enable video upload and automated analysis pipeline</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">04</div>
+            <div class="obj-item-text">Improve accuracy under real-world conditions — masks, low light, partial occlusion</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">05</div>
+            <div class="obj-item-text">Apply multi-frame verification to reduce false-positive identification results</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">06</div>
+            <div class="obj-item-text">Integrate audio and video detection into a unified multimodal pipeline</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">07</div>
+            <div class="obj-item-text">Generate alerts with confidence scores for human officer review</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">08</div>
+            <div class="obj-item-text">Build a user-friendly web officer dashboard for evidence management</div>
+          </div>
+          <div class="obj-item">
+            <div class="obj-item-num">09</div>
+            <div class="obj-item-text">Ensure tamper-proof, secure storage of all records using blockchain</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── METHODOLOGY ── -->
+  <section class="domain-section">
+    <div class="section-label reveal">05A / 05</div>
+    <h2 class="section-title reveal">METHODOLOGY</h2>
+
+    <div class="method-steps">
+      <div class="method-step reveal">
+        <div class="method-step-num">01</div>
+        <div class="method-icon">🗂</div>
+        <h4>Data Collection</h4>
+        <p>Gathering images, videos, and audio datasets representative of real-world surveillance scenarios including occlusion cases and Sri Lankan contexts.</p>
+        <div class="method-tags">
+          <span class="method-tag">Images</span>
+          <span class="method-tag">Videos</span>
+          <span class="method-tag">Audio</span>
+        </div>
+      </div>
+      <div class="method-step reveal" style="transition-delay:.08s">
+        <div class="method-step-num">02</div>
+        <div class="method-icon">⚙️</div>
+        <h4>Preprocessing</h4>
+        <p>Image resizing, normalisation, augmentation for visual data. MFCC feature extraction for audio data to prepare inputs for model training.</p>
+        <div class="method-tags">
+          <span class="method-tag">Image Resize</span>
+          <span class="method-tag">MFCC</span>
+          <span class="method-tag">Augmentation</span>
+        </div>
+      </div>
+      <div class="method-step reveal" style="transition-delay:.16s">
+        <div class="method-step-num">03</div>
+        <div class="method-icon">🧠</div>
+        <h4>Model Development</h4>
+        <p>Training YOLO for object detection, CNN models for audio classification, and face recognition models with occlusion-robust training strategies.</p>
+        <div class="method-tags">
+          <span class="method-tag">YOLO</span>
+          <span class="method-tag">CNN</span>
+          <span class="method-tag">FaceNet</span>
+        </div>
+      </div>
+      <div class="method-step reveal" style="transition-delay:.24s">
+        <div class="method-step-num">04</div>
+        <div class="method-icon">🔗</div>
+        <h4>System Integration</h4>
+        <p>Backend using Flask / FastAPI connecting AI models to the React frontend dashboard, with Ethereum smart contracts managing secure data storage.</p>
+        <div class="method-tags">
+          <span class="method-tag">FastAPI</span>
+          <span class="method-tag">React</span>
+          <span class="method-tag">Ethereum</span>
+        </div>
+      </div>
+      <div class="method-step reveal" style="transition-delay:.32s">
+        <div class="method-step-num">05</div>
+        <div class="method-icon">🎛</div>
+        <h4>Multimodal Fusion</h4>
+        <p>Combining video and audio detection results into a unified confidence score to improve identification accuracy and reduce false positives.</p>
+        <div class="method-tags">
+          <span class="method-tag">Score Fusion</span>
+          <span class="method-tag">Multi-frame</span>
+          <span class="method-tag">Confidence</span>
+        </div>
+      </div>
+      <div class="method-step reveal" style="transition-delay:.40s">
+        <div class="method-step-num">06</div>
+        <div class="method-icon">🧪</div>
+        <h4>Testing & Evaluation</h4>
+        <p>Evaluating system performance using accuracy, precision, and recall metrics. Real-world testing across varied lighting, occlusion, and noise conditions.</p>
+        <div class="method-tags">
+          <span class="method-tag">Accuracy</span>
+          <span class="method-tag">Precision</span>
+          <span class="method-tag">Recall</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TECH STACK ── -->
+  <section class="domain-section">
+    <div class="section-label reveal">05B / 05</div>
+    <h2 class="section-title reveal">TECHNOLOGIES<br>USED</h2>
+
+    <div class="tech-grid">
+      <div class="tech-col reveal">
+        <div class="tech-col-icon">🖥</div>
+        <div class="tech-col-title">Frontend</div>
+        <div class="tech-items">
+          <div class="tech-item">React.js</div>
+          <div class="tech-item">HTML5</div>
+          <div class="tech-item">CSS3</div>
+        </div>
+      </div>
+      <div class="tech-col reveal" style="transition-delay:.08s">
+        <div class="tech-col-icon">⚙️</div>
+        <div class="tech-col-title">Backend</div>
+        <div class="tech-items">
+          <div class="tech-item">Python</div>
+          <div class="tech-item">Flask</div>
+          <div class="tech-item">FastAPI</div>
+        </div>
+      </div>
+      <div class="tech-col reveal" style="transition-delay:.16s">
+        <div class="tech-col-icon">🧠</div>
+        <div class="tech-col-title">AI & ML</div>
+        <div class="tech-items">
+          <div class="tech-item">YOLOv8</div>
+          <div class="tech-item">TensorFlow</div>
+          <div class="tech-item">OpenCV</div>
+          <div class="tech-item">Librosa</div>
+        </div>
+      </div>
+      <div class="tech-col reveal" style="transition-delay:.24s">
+        <div class="tech-col-icon">🔒</div>
+        <div class="tech-col-title">Security</div>
+        <div class="tech-items">
+          <div class="tech-item">Blockchain</div>
+          <div class="tech-item">Ethereum</div>
+          <div class="tech-item">Solidity</div>
+          <div class="tech-item">REST APIs</div>
+        </div>
+      </div>
+      <div class="tech-col reveal" style="transition-delay:.32s">
+        <div class="tech-col-icon">🛠</div>
+        <div class="tech-col-title">Tools</div>
+        <div class="tech-items">
+          <div class="tech-item">GitHub</div>
+          <div class="tech-item">VS Code</div>
+          <div class="tech-item">Google Colab</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SYSTEM COMPONENTS ── -->
+<section class="domain-section">
+  <div class="section-label reveal">06 / 06</div>
+  <h2 class="section-title reveal">SYSTEM<br>COMPONENTS</h2>
+
+  <div class="survey-grid">
+
+    <!-- Vision -->
+    <div class="survey-card reveal">
+      <div class="survey-card-label">// COMPONENT 01</div>
+      <h4>Vision Detection Module</h4>
+      <p style="font-size:14px; line-height:1.7; color: rgba(242,239,232,0.6);">
+        This component is an AI-based vision detection system designed to identify emergency situations from images and video data. It utilizes advanced object detection models such as YOLO to analyze visual content in real time and detect critical events including fire, smoke, weapons, and abnormal human activities. The system processes video frames sequentially, extracting important visual features and generating bounding boxes with confidence scores. By automating visual monitoring, it reduces the need for continuous human supervision and enables faster threat detection.
+      </p>
+    </div>
+
+    <!-- Audio -->
+    <div class="survey-card reveal">
+      <div class="survey-card-label">// COMPONENT 02</div>
+      <h4>Audio Detection Module</h4>
+      <p style="font-size:14px; line-height:1.7; color: rgba(242,239,232,0.6);">
+        This component focuses on analyzing audio data to detect potentially dangerous events that may not be visible in video footage. It uses MFCC feature extraction and deep learning models such as CNNs to classify sounds like gunshots, explosions, and accident noises. By integrating audio-based detection, this module enhances system reliability in low-visibility environments and provides an additional layer of security.
+      </p>
+    </div>
+
+    <!-- Criminal -->
+    <div class="survey-card reveal">
+      <div class="survey-card-label">// COMPONENT 03</div>
+      <h4>Criminal Identification Module</h4>
+      <p style="font-size:14px; line-height:1.7; color: rgba(242,239,232,0.6);">
+        This component is responsible for identifying individuals using advanced face recognition techniques such as ArcFace and FaceNet. It extracts unique facial features and compares them with stored records. The system works under real-world conditions including masks, occlusion, and varying lighting. Multi-frame verification improves accuracy and reduces false identification, supporting law enforcement operations.
+      </p>
+    </div>
+
+    <!-- Main System -->
+    <div class="survey-card reveal">
+      <div class="survey-card-label">// COMPONENT 04</div>
+      <h4>AI Surveillance System</h4>
+      <p style="font-size:14px; line-height:1.7; color: rgba(242,239,232,0.6);">
+        This component presents an AI-powered real-time surveillance system that detects violent behavior and missing objects from video data. It uses a CNN–LSTM model to analyze motion patterns and identify suspicious activities such as fighting and robbery. A YOLOv8-based module monitors objects and detects removal events, while an IoU-based mechanism distinguishes between occlusion and actual theft. All components are integrated into a unified pipeline using a Flask backend and React dashboard, enabling real-time alerts, video uploads, and interactive monitoring. This system reduces manual effort, improves response time, and provides a scalable solution for intelligent surveillance.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-logo">CISS</div>
+  <div class="footer-text">© 2026 Research Project · SLIIT · All rights reserved</div>
+  <div class="footer-links">
+    <a href="../index.html">Home</a>
+    <a href="domain.html">Domain</a>
+    <a href="documents.html">Documents</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</footer>
+
+<script>
+  const dot  = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left = mouseX + 'px'; dot.style.top = mouseY + 'px';
+  });
+  (function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  })();
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

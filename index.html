@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISS — Blockchain-Based Criminal Identification System</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f2efe8;
+    --cyan: #00e5ff;
+    --red: #ff2d55;
+    --muted: #6b6b7a;
+    --grid: rgba(0,229,255,0.06);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--ink); color: var(--paper); overflow-x: hidden; cursor: none; }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; }
+  .cursor-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; transform: translate(-50%, -50%); transition: transform 0.1s; }
+  .cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(0,229,255,0.4); border-radius: 50%; transform: translate(-50%, -50%); transition: transform 0.15s ease, width 0.2s, height 0.2s, border-color 0.2s; position: absolute; top: 0; left: 0; }
+  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 52px; height: 52px; border-color: var(--cyan); }
+
+  body::before { content: ''; position: fixed; inset: 0; z-index: 9990; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; }
+
+  /* ── NAV ── */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; padding: 22px 6%; background: rgba(10,10,15,0.8); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(0,229,255,0.1); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 20px rgba(0,229,255,0.5); text-decoration: none; }
+  nav ul { list-style: none; display: flex; gap: 8px; }
+  nav ul li a { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(242,239,232,0.55); text-decoration: none; padding: 7px 14px; border: 1px solid transparent; border-radius: 2px; transition: all 0.2s; }
+  nav ul li a:hover { color: var(--cyan); border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.05); }
+
+  /* ── HERO ── */
+  .hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 120px 6% 80px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 60px 60px; animation: gridShift 20s linear infinite; }
+  @keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
+  .hero::after { content: ''; position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(0,229,255,0.08) 0%, transparent 70%); top: 50%; right: 5%; transform: translateY(-50%); animation: pulse 4s ease-in-out infinite; pointer-events: none; }
+  @keyframes pulse { 0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.8; } 50% { transform: translateY(-50%) scale(1.1); opacity: 1; } }
+
+  .hero-left { position: relative; z-index: 2; }
+  .hero-tag { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--cyan); margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
+  .hero-tag::before { content: ''; display: inline-block; width: 30px; height: 1px; background: var(--cyan); }
+  .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 7vw, 96px); line-height: 0.92; letter-spacing: 2px; margin-bottom: 28px; }
+  .hero h1 em { font-style: normal; color: var(--cyan); text-shadow: 0 0 30px rgba(0,229,255,0.4); }
+  .hero-desc { font-size: 16px; line-height: 1.7; color: rgba(242,239,232,0.65); max-width: 460px; margin-bottom: 44px; }
+  .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  .btn-primary { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; padding: 16px 32px; background: var(--cyan); color: var(--ink); text-decoration: none; font-weight: 700; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); transition: all 0.25s; }
+  .btn-primary:hover { background: #fff; box-shadow: 0 0 30px rgba(0,229,255,0.4); }
+  .btn-ghost { font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: 1px; padding: 16px 32px; border: 1px solid rgba(242,239,232,0.2); color: var(--paper); text-decoration: none; transition: all 0.25s; }
+  .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* Hero right */
+  .hero-right { position: relative; z-index: 2; display: flex; justify-content: center; align-items: center; }
+  .face-scanner { width: 320px; height: 320px; position: relative; }
+  .scanner-face { width: 100%; height: 100%; border: 1px solid rgba(0,229,255,0.2); border-radius: 4px; display: grid; place-items: center; position: relative; overflow: hidden; background: rgba(0,229,255,0.02); }
+  .scanner-face::before { content: ''; position: absolute; width: 30px; height: 30px; border-color: var(--cyan); border-style: solid; top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+  .scanner-face::after  { content: ''; position: absolute; width: 30px; height: 30px; border-color: var(--cyan); border-style: solid; bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+  .scan-line { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); box-shadow: 0 0 12px var(--cyan); animation: scanDown 2.5s ease-in-out infinite; }
+  @keyframes scanDown { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+  .face-dots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 18px; padding: 40px; }
+  .face-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(0,229,255,0.3); animation: dotBlink 3s ease-in-out infinite; }
+  .face-dot:nth-child(odd) { animation-delay: 0.5s; }
+  .face-dot:nth-child(3n) { animation-delay: 1s; background: rgba(0,229,255,0.6); }
+  @keyframes dotBlink { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.5); } }
+  .hero-stats { position: absolute; bottom: -50px; left: 0; right: 0; display: flex; gap: 2px; }
+  .stat-chip { flex: 1; font-family: 'Space Mono', monospace; font-size: 10px; padding: 10px 14px; background: rgba(0,229,255,0.06); border: 1px solid rgba(0,229,255,0.12); color: var(--cyan); letter-spacing: 1px; }
+  .stat-chip span { display: block; font-size: 18px; font-weight: 700; margin-bottom: 2px; color: var(--paper); }
+  .data-label { position: absolute; font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(0,229,255,0.7); letter-spacing: 1px; background: rgba(10,10,15,0.8); padding: 5px 10px; border: 1px solid rgba(0,229,255,0.2); white-space: nowrap; animation: floatLabel 4s ease-in-out infinite; }
+  .data-label:nth-child(2) { top: -16px; right: 20px; animation-delay: 0.8s; }
+  .data-label:nth-child(3) { bottom: -16px; left: 10px; animation-delay: 1.6s; }
+  .data-label:nth-child(4) { top: 50%; left: -80px; animation-delay: 2.4s; }
+  @keyframes floatLabel { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+  /* ── TICKER ── */
+  .ticker { background: var(--cyan); color: var(--ink); padding: 10px 0; overflow: hidden; border-top: 1px solid rgba(0,229,255,0.3); border-bottom: 1px solid rgba(0,229,255,0.3); }
+  .ticker-inner { display: flex; animation: tickerScroll 25s linear infinite; white-space: nowrap; }
+  .ticker-item { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 0 40px; flex-shrink: 0; }
+  .ticker-item::before { content: '✦'; margin-right: 40px; opacity: 0.5; }
+  @keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ── SECTION SHARED ── */
+  .section { padding: 100px 6%; }
+  .section-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--cyan); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,229,255,0.4), transparent); }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 5vw, 72px); line-height: 1; letter-spacing: 2px; margin-bottom: 60px; }
+
+  /* ── MODULE ROWS ── */
+  .modules-wrap { display: flex; flex-direction: column; gap: 2px; }
+
+  .module-row {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2px;
+    transition: all .3s;
+  }
+
+  .module-index {
+    padding: 40px 36px;
+    background: rgba(0,229,255,0.04);
+    border: 1px solid rgba(0,229,255,0.14);
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+    transition: all .3s;
+  }
+  .module-row:hover .module-index { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.3); }
+
+  /* Ghost number behind each index panel */
+  .module-index::after {
+    content: attr(data-num);
+    position: absolute; right: -12px; bottom: -16px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 110px;
+    color: rgba(0,229,255,0.07); line-height: 1; pointer-events: none;
+  }
+
+  .module-num {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    letter-spacing: 3px; color: var(--cyan); margin-bottom: 12px;
+  }
+  .module-icon { font-size: 32px; margin-bottom: 14px; }
+  .module-name {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    letter-spacing: 1px; line-height: 1.1; margin-bottom: 10px;
+  }
+  .module-badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; padding: 4px 10px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    color: var(--cyan);
+  }
+
+  .module-body {
+    padding: 40px 44px;
+    background: rgba(242,239,232,0.02);
+    border: 1px solid rgba(242,239,232,0.07);
+    transition: all .3s;
+    position: relative; overflow: hidden;
+  }
+  .module-body::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    background: var(--cyan);
+    transform: scaleY(0); transform-origin: top; transition: transform .4s;
+  }
+  .module-row:hover .module-body { border-color: rgba(0,229,255,0.18); background: rgba(0,229,255,0.02); }
+  .module-row:hover .module-body::before { transform: scaleY(1); }
+
+  .module-body p {
+    font-size: 14px; line-height: 1.8;
+    color: rgba(242,239,232,0.6);
+    margin-bottom: 20px;
+  }
+  .module-body p:last-of-type { margin-bottom: 0; }
+
+  .module-tech-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 20px; }
+  .module-tech {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 1px; padding: 4px 10px;
+    border: 1px solid rgba(0,229,255,0.15);
+    color: rgba(0,229,255,0.55);
+    transition: all .2s;
+  }
+  .module-tech:hover { color: var(--cyan); border-color: rgba(0,229,255,0.4); }
+
+  /* ── SYSTEM OVERVIEW (replaces highlights) ── */
+  .highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .highlights-visual { position: relative; }
+  .pipeline { display: flex; flex-direction: column; gap: 0; }
+  .pipeline-step { display: flex; align-items: center; gap: 20px; padding: 20px 24px; border: 1px solid rgba(0,229,255,0.1); background: rgba(0,229,255,0.02); position: relative; transition: all 0.25s; }
+  .pipeline-step:not(:last-child)::after { content: ''; position: absolute; left: 35px; bottom: -14px; width: 1px; height: 14px; background: rgba(0,229,255,0.3); z-index: 1; }
+  .pipeline-step:not(:first-child) { margin-top: -1px; }
+  .pipeline-step:hover { background: rgba(0,229,255,0.06); border-color: rgba(0,229,255,0.3); z-index: 2; }
+  .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 11px; width: 22px; height: 22px; background: var(--cyan); color: var(--ink); display: grid; place-items: center; border-radius: 50%; flex-shrink: 0; letter-spacing: 0; }
+  .step-info { flex: 1; }
+  .step-title { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: var(--paper); letter-spacing: 1px; margin-bottom: 4px; }
+  .step-desc { font-size: 12px; color: rgba(242,239,232,0.45); }
+  .step-badge { font-family: 'Space Mono', monospace; font-size: 10px; padding: 3px 8px; background: rgba(0,229,255,0.1); color: var(--cyan); border: 1px solid rgba(0,229,255,0.2); letter-spacing: 1px; white-space: nowrap; }
+
+  .highlights-text p { font-size: 15px; line-height: 1.8; color: rgba(242,239,232,0.65); margin-bottom: 20px; }
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 36px; }
+  .metric-box { padding: 24px 20px; background: rgba(242,239,232,0.03); border: 1px solid rgba(242,239,232,0.08); }
+  .metric-val { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--cyan); line-height: 1; margin-bottom: 6px; }
+  .metric-lbl { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; color: rgba(242,239,232,0.4); }
+
+  /* ── TECH SECTION ── */
+  .tech-section { padding: 100px 6%; border-top: 1px solid rgba(242,239,232,0.06); }
+  .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 60px; }
+  .tech-item { padding: 30px 24px; background: rgba(242,239,232,0.02); border: 1px solid rgba(242,239,232,0.06); text-align: center; transition: all 0.25s; }
+  .tech-item:hover { background: rgba(0,229,255,0.05); border-color: rgba(0,229,255,0.2); }
+  .tech-item-icon { font-size: 28px; margin-bottom: 14px; }
+  .tech-item-name { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--paper); margin-bottom: 6px; }
+  .tech-item-role { font-size: 12px; color: rgba(242,239,232,0.4); }
+
+  /* ── TEAM SECTION ── */
+  .team-section { padding: 100px 6%; background: rgba(242,239,232,0.02); border-top: 1px solid rgba(242,239,232,0.06); }
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 60px; }
+  .team-card { padding: 36px 28px; border: 1px solid rgba(242,239,232,0.06); background: rgba(10,10,15,0.8); position: relative; overflow: hidden; }
+  .team-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--cyan); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+  .team-card:hover::before { transform: scaleX(1); }
+  .team-avatar { width: 52px; height: 52px; background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.25); border-radius: 2px; display: grid; place-items: center; font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--cyan); margin-bottom: 20px; letter-spacing: 1px; }
+  .team-name { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; margin-bottom: 6px; }
+  .team-role { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--cyan); letter-spacing: 1px; margin-bottom: 14px; }
+  .team-id { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(242,239,232,0.3); }
+
+  /* ── FOOTER ── */
+  footer { padding: 50px 6%; border-top: 1px solid rgba(242,239,232,0.08); display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 6px; color: var(--cyan); }
+  .footer-text { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(242,239,232,0.3); letter-spacing: 1px; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px; color: rgba(242,239,232,0.4); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--cyan); }
+
+  /* ── ANIMATIONS ── */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1000px) {
+    .module-row { grid-template-columns: 1fr; }
+    .module-index::after { display: none; }
+  }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 60px; }
+    .hero-right { display: none; }
+    .highlights { grid-template-columns: 1fr; }
+    .tech-grid { grid-template-columns: repeat(2, 1fr); }
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+    nav ul { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor">
+  <div class="cursor-ring"></div>
+  <div class="cursor-dot"></div>
+</div>
+
+<nav>
+  <a href="index.html" class="logo">CISS</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="pages/domain.html">Domain</a></li>
+    <li><a href="pages/milestones.html">Milestones</a></li>
+    <li><a href="pages/documents.html">Documents</a></li>
+    <li><a href="pages/presentations.html">Presentations</a></li>
+    <li><a href="pages/about.html">About</a></li>
+    <li><a href="pages/contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-left reveal">
+    <div class="hero-tag">Research Project · SLIIT · 2026</div>
+    <h1>CRIMINAL<br><em>IDENTIFICATION</em><br>SYSTEM</h1>
+    <p class="hero-desc">
+      A tamper-proof biometric identification platform combining ArcFace recognition,
+      YOLOv8 occlusion detection, and Ethereum smart contracts — built for real-world law enforcement.
+    </p>
+    <div class="hero-cta">
+      <a href="pages/domain.html" class="btn-primary">EXPLORE PROJECT</a>
+      <a href="pages/documents.html" class="btn-ghost">VIEW DOCUMENTS</a>
+    </div>
+  </div>
+
+  <div class="hero-right reveal" style="transition-delay:0.3s">
+    <div class="face-scanner">
+      <div class="data-label">FACE_DETECT: ACTIVE</div>
+      <div class="data-label">BLOCKCHAIN: SECURED</div>
+      <div class="data-label" style="top:auto;bottom:60px;left:-90px;animation-delay:1.2s">SIM: 76.9%</div>
+      <div class="scanner-face">
+        <div class="scan-line"></div>
+        <div class="face-dots">
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+          <div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div><div class="face-dot"></div>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-chip"><span>95.9%</span>mAP50</div>
+        <div class="stat-chip"><span>76.9%</span>Avg Conf.</div>
+        <div class="stat-chip"><span>30</span>Frames</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">FACE RECOGNITION</span>
+    <span class="ticker-item">BLOCKCHAIN SECURITY</span>
+    <span class="ticker-item">OCCLUSION DETECTION</span>
+    <span class="ticker-item">ARCFACE MODEL</span>
+    <span class="ticker-item">YOLOV8</span>
+    <span class="ticker-item">ETHEREUM SMART CONTRACTS</span>
+    <span class="ticker-item">OFFICER DASHBOARD</span>
+    <span class="ticker-item">MULTI-FRAME VERIFICATION</span>
+    <span class="ticker-item">FACE RECOGNITION</span>
+    <span class="ticker-item">BLOCKCHAIN SECURITY</span>
+    <span class="ticker-item">OCCLUSION DETECTION</span>
+    <span class="ticker-item">ARCFACE MODEL</span>
+    <span class="ticker-item">YOLOV8</span>
+    <span class="ticker-item">ETHEREUM SMART CONTRACTS</span>
+    <span class="ticker-item">OFFICER DASHBOARD</span>
+    <span class="ticker-item">MULTI-FRAME VERIFICATION</span>
+  </div>
+</div>
+
+<!-- ── MODULE ROWS (replaces 3 cards) ── -->
+<section class="section" style="padding-top:120px">
+  <div class="section-label reveal">PROJECT OVERVIEW</div>
+  <h2 class="section-title reveal">CORE<br>MODULES</h2>
+
+  <div class="modules-wrap">
+
+    <!-- Module 1: Vision Detection -->
+    <div class="module-row reveal">
+      <div class="module-index" data-num="01">
+        <div class="module-num">// MODULE 01</div>
+        <div class="module-icon">👁️</div>
+        <div class="module-name">Vision Detection Module</div>
+        <div class="module-badge">AI · COMPUTER VISION</div>
+      </div>
+      <div class="module-body">
+        <p>
+          An AI-based vision detection system designed to identify emergency situations from images and video data. It utilises advanced object detection models such as YOLO to analyse visual content in real time and detect critical events including fire, smoke, weapons, and abnormal human activities.
+        </p>
+        <p>
+          The system processes video frames sequentially, extracting important visual features and generating bounding boxes with confidence scores for detected objects. By automating visual monitoring, this module significantly reduces the need for continuous human supervision and enables faster identification of potential threats in surveillance environments.
+        </p>
+        <div class="module-tech-row">
+          <span class="module-tech">YOLOv8</span>
+          <span class="module-tech">OpenCV</span>
+          <span class="module-tech">Bounding Boxes</span>
+          <span class="module-tech">Confidence Scores</span>
+          <span class="module-tech">Frame Analysis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 2: Audio Detection -->
+    <div class="module-row reveal" style="transition-delay:.1s">
+      <div class="module-index" data-num="02">
+        <div class="module-num">// MODULE 02</div>
+        <div class="module-icon">🎙️</div>
+        <div class="module-name">Audio Detection Module</div>
+        <div class="module-badge">SIGNAL PROCESSING · CNN</div>
+      </div>
+      <div class="module-body">
+        <p>
+          Focuses on analysing audio data to detect potentially dangerous events that may not be clearly visible in video footage. It uses signal processing techniques such as Mel-Frequency Cepstral Coefficients (MFCC) along with deep learning models like Convolutional Neural Networks (CNNs) to classify sounds.
+        </p>
+        <p>
+          The system is capable of identifying events such as gunshots, explosions, and accident-related noises. By integrating audio-based detection, this module enhances the overall reliability of the system, especially in scenarios with poor visibility or occluded video input, providing an additional layer of security.
+        </p>
+        <div class="module-tech-row">
+          <span class="module-tech">MFCC</span>
+          <span class="module-tech">CNN</span>
+          <span class="module-tech">Librosa</span>
+          <span class="module-tech">Audio Classification</span>
+          <span class="module-tech">TensorFlow</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 3: Criminal Identification -->
+    <div class="module-row reveal" style="transition-delay:.2s">
+      <div class="module-index" data-num="03">
+        <div class="module-num">// MODULE 03</div>
+        <div class="module-icon">🧠</div>
+        <div class="module-name">Criminal Identification Module</div>
+        <div class="module-badge">FACE RECOGNITION · MULTI-FRAME</div>
+      </div>
+      <div class="module-body">
+        <p>
+          Responsible for identifying individuals using advanced face recognition techniques. It employs models such as ArcFace or FaceNet to extract unique facial features and compare them against stored records in a database. The system is designed to function effectively under real-world conditions, including partial occlusion, masks, and varying lighting environments.
+        </p>
+        <p>
+          To improve accuracy, multi-frame verification is used, where multiple frames are analysed before confirming an identity. This module plays a crucial role in supporting law enforcement and security operations by enabling fast and reliable suspect identification.
+        </p>
+        <div class="module-tech-row">
+          <span class="module-tech">ArcFace</span>
+          <span class="module-tech">FaceNet</span>
+          <span class="module-tech">InsightFace</span>
+          <span class="module-tech">Multi-Frame Verify</span>
+          <span class="module-tech">Face Embeddings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module 4: Violent Behaviour & Object Detection -->
+    <div class="module-row reveal" style="transition-delay:.3s">
+      <div class="module-index" data-num="04">
+        <div class="module-num">// MODULE 04</div>
+        <div class="module-icon">🚨</div>
+        <div class="module-name">Violent Behaviour & Object Detection</div>
+        <div class="module-badge">CNN–LSTM · IOU OCCLUSION</div>
+      </div>
+      <div class="module-body">
+        <p>
+          An AI-powered real-time surveillance system designed to enhance public safety by automatically detecting violent behaviour and missing objects from video data. The system processes CCTV or uploaded video footage and applies advanced deep learning techniques to analyse both spatial and temporal patterns.
+        </p>
+        <p>
+          A CNN–LSTM-based model recognises suspicious or violent human activities such as fighting, assault, and robbery by understanding motion across consecutive video frames. A YOLOv8-based object detection module simultaneously monitors objects within the scene and identifies when an item has been removed. An IoU-based occlusion detection mechanism distinguishes between objects that are temporarily hidden and those that are actually stolen — reducing false alerts. All components are integrated into a unified pipeline supported by a Flask backend and a React-based web interface, allowing users to upload videos, view detection results, and receive real-time alerts.
+        </p>
+        <div class="module-tech-row">
+          <span class="module-tech">CNN–LSTM</span>
+          <span class="module-tech">YOLOv8</span>
+          <span class="module-tech">IoU Occlusion</span>
+          <span class="module-tech">Flask</span>
+          <span class="module-tech">React Dashboard</span>
+          <span class="module-tech">Real-Time Alerts</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Pipeline + Metrics -->
+<section class="section" style="border-top: 1px solid rgba(242,239,232,0.06)">
+  <div class="highlights">
+    <div class="highlights-visual reveal">
+      <div class="section-label">HOW IT WORKS</div>
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="step-num">1</div>
+          <div class="step-info">
+            <div class="step-title">VIDEO UPLOAD</div>
+            <div class="step-desc">Officer submits mobile footage via dashboard</div>
+          </div>
+          <div class="step-badge">FastAPI</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">2</div>
+          <div class="step-info">
+            <div class="step-title">OCCLUSION DETECTION</div>
+            <div class="step-desc">YOLOv8 flags caps, sunglasses, masks per frame</div>
+          </div>
+          <div class="step-badge">95.9% mAP</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">3</div>
+          <div class="step-info">
+            <div class="step-title">FACE RECOGNITION</div>
+            <div class="step-desc">ArcFace compares embeddings to enrolled database</div>
+          </div>
+          <div class="step-badge">InsightFace</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">4</div>
+          <div class="step-info">
+            <div class="step-title">MULTI-FRAME VERIFY</div>
+            <div class="step-desc">Confidence accumulated across matched frames</div>
+          </div>
+          <div class="step-badge">30 Frames</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="step-num">5</div>
+          <div class="step-info">
+            <div class="step-title">BLOCKCHAIN LOG</div>
+            <div class="step-desc">Identification event written to Ethereum ledger</div>
+          </div>
+          <div class="step-badge">Immutable</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlights-text reveal" style="transition-delay:0.2s">
+      <div class="section-label">PERFORMANCE</div>
+      <h2 class="section-title" style="font-size:clamp(36px,4vw,56px)">PROVEN<br>RESULTS</h2>
+      <p>Evaluated against real mobile-phone footage with a pre-enrolled test subject using a separate controlled enrolment photograph — matching real investigative conditions.</p>
+      <p>The multi-frame accumulation mechanism collected evidence across 19.6 seconds of footage, providing ten times the minimum identification threshold required for a confirmed result.</p>
+      <div class="metric-grid">
+        <div class="metric-box">
+          <div class="metric-val">95.9%</div>
+          <div class="metric-lbl">Occlusion mAP50</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val">76.9%</div>
+          <div class="metric-lbl">Avg. ID Confidence</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val">73.4%</div>
+          <div class="metric-lbl">Sunglasses Similarity</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-val">71.4%</div>
+          <div class="metric-lbl">Frame Match Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="tech-section">
+  <div class="section-label">TECHNOLOGY</div>
+  <h2 class="section-title reveal">BUILT WITH</h2>
+  <div class="tech-grid">
+    <div class="tech-item reveal">
+      <div class="tech-item-icon">🤖</div>
+      <div class="tech-item-name">YOLOv8n</div>
+      <div class="tech-item-role">Occlusion Detection</div>
+    </div>
+    <div class="tech-item reveal" style="transition-delay:0.1s">
+      <div class="tech-item-icon">👁️</div>
+      <div class="tech-item-name">InsightFace</div>
+      <div class="tech-item-role">ArcFace Recognition</div>
+    </div>
+    <div class="tech-item reveal" style="transition-delay:0.2s">
+      <div class="tech-item-icon">⛓️</div>
+      <div class="tech-item-name">Ethereum</div>
+      <div class="tech-item-role">Smart Contracts</div>
+    </div>
+    <div class="tech-item reveal" style="transition-delay:0.3s">
+      <div class="tech-item-icon">⚡</div>
+      <div class="tech-item-name">FastAPI</div>
+      <div class="tech-item-role">Backend API</div>
+    </div>
+    <div class="tech-item reveal" style="transition-delay:0.4s">
+      <div class="tech-item-icon">⚛️</div>
+      <div class="tech-item-name">React</div>
+      <div class="tech-item-role">Officer Dashboard</div>
+    </div>
+    <div class="tech-item reveal" style="transition-delay:0.5s">
+      <div class="tech-item-icon">🎵</div>
+      <div class="tech-item-name">Librosa</div>
+      <div class="tech-item-role">Audio Processing</div>
+    </div>
+    <div class="tech-item reveal" style="transition-delay:0.6s">
+      <div class="tech-item-icon">🐍</div>
+      <div class="tech-item-name">Python</div>
+      <div class="tech-item-role">Core Pipeline</div>
+    </div>
+    <div class="tech-item reveal" style="transition-delay:0.7s">
+      <div class="tech-item-icon">📜</div>
+      <div class="tech-item-name">Solidity</div>
+      <div class="tech-item-role">Contract Language</div>
+    </div>
+  </div>
+</section>
+
+<!-- Team -->
+<section class="team-section">
+  <div class="section-label">THE TEAM</div>
+  <h2 class="section-title reveal">RESEARCHERS</h2>
+  <div class="team-grid">
+    <div class="team-card reveal">
+      <div class="team-avatar">IT</div>
+      <div class="team-name">YEVIN THEENURA</div>
+      <div class="team-role">Lead Developer</div>
+      <div class="team-id">// SLIIT · IT22324788</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.1s">
+      <div class="team-avatar">IT</div>
+      <div class="team-name">THARAKA LAKSHAN</div>
+      <div class="team-role">ML Engineer</div>
+      <div class="team-id">// SLIIT · IT22319524</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.2s">
+      <div class="team-avatar">IT</div>
+      <div class="team-name">SENURI AMANDI</div>
+      <div class="team-role">Blockchain Dev</div>
+      <div class="team-id">// SLIIT · IT22920072</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.3s">
+      <div class="team-avatar">IT</div>
+      <div class="team-name">NALINDA RANASINGHE</div>
+      <div class="team-role">Frontend Dev</div>
+      <div class="team-id">// SLIIT · IT22331786</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">CISS</div>
+  <div class="footer-text">© 2026 Research Project · SLIIT · All rights reserved</div>
+  <div class="footer-links">
+    <a href="pages/domain.html">Domain</a>
+    <a href="pages/documents.html">Documents</a>
+    <a href="pages/contact.html">Contact</a>
+  </div>
+</footer>
+
+<script>
+  const dot  = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.left = mouseX + 'px'; dot.style.top = mouseY + 'px';
+  });
+  (function animateRing() {
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  })();
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  setTimeout(() => {
+    document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('in-view'));
+  }, 100);
+</script>
+</body>
+</html>
