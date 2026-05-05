@@ -24,33 +24,18 @@
   .cursor-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; transform: translate(-50%,-50%); }
   .cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(0,229,255,0.4); border-radius: 50%; transform: translate(-50%,-50%); transition: width .2s, height .2s, border-color .2s; position: absolute; top: 0; left: 0; }
   body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 52px; height: 52px; border-color: var(--cyan); }
-
   body::before { content: ''; position: fixed; inset: 0; z-index: 9990; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; }
 
   /* ── NAV ── */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 22px 6%;
-    background: rgba(10,10,15,0.85);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(0,229,255,0.1);
-  }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; padding: 22px 6%; background: rgba(10,10,15,0.85); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(0,229,255,0.1); }
   .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 20px rgba(0,229,255,0.5); text-decoration: none; }
   nav ul { list-style: none; display: flex; gap: 8px; }
   nav ul li a { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(242,239,232,0.55); text-decoration: none; padding: 7px 14px; border: 1px solid transparent; border-radius: 2px; transition: all .2s; }
   nav ul li a:hover, nav ul li a.active { color: var(--cyan); border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.05); }
 
   /* ── PAGE HEADER ── */
-  .page-header {
-    min-height: 44vh; padding: 160px 6% 80px;
-    position: relative; overflow: hidden; display: flex; align-items: flex-end;
-  }
-  .page-header::before {
-    content: ''; position: absolute; inset: 0;
-    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 60px 60px; animation: gridShift 20s linear infinite;
-  }
+  .page-header { min-height: 44vh; padding: 160px 6% 80px; position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+  .page-header::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 60px 60px; animation: gridShift 20s linear infinite; }
   @keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
   .page-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 160px; background: linear-gradient(transparent, var(--ink)); }
   .header-ghost { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 16vw, 210px); color: rgba(0,229,255,0.04); letter-spacing: 8px; right: 4%; bottom: -20px; line-height: 1; user-select: none; z-index: 0; }
@@ -75,142 +60,64 @@
   .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 4vw, 60px); letter-spacing: 2px; margin-bottom: 40px; line-height: 1; }
 
   /* ── CONTACT LAYOUT ── */
-  .contact-wrap {
-    display: grid;
-    grid-template-columns: 1fr 1.6fr;
-    gap: 2px;
-    margin-bottom: 100px;
-  }
+  .contact-wrap { display: grid; grid-template-columns: 1fr 1.6fr; gap: 2px; margin-bottom: 100px; }
+  .contact-info { display: flex; flex-direction: column; gap: 2px; }
 
-  /* ── CONTACT INFO PANEL ── */
-  .contact-info {
-    display: flex; flex-direction: column; gap: 2px;
-  }
-
-  .contact-channel {
-    padding: 36px 36px;
-    background: rgba(242,239,232,0.02);
-    border: 1px solid rgba(242,239,232,0.07);
-    position: relative; overflow: hidden;
-    transition: all .3s;
-    text-decoration: none; color: inherit;
-    display: flex; align-items: flex-start; gap: 20px;
-  }
+  .contact-channel { padding: 36px 36px; background: rgba(242,239,232,0.02); border: 1px solid rgba(242,239,232,0.07); position: relative; overflow: hidden; transition: all .3s; text-decoration: none; color: inherit; display: flex; align-items: flex-start; gap: 20px; }
   .contact-channel:hover { border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.03); }
-  .contact-channel::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-    background: var(--cyan);
-    transform: scaleY(0); transform-origin: top; transition: transform .35s;
-  }
+  .contact-channel::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--cyan); transform: scaleY(0); transform-origin: top; transition: transform .35s; }
   .contact-channel:hover::before { transform: scaleY(1); }
 
-  .channel-icon {
-    width: 48px; height: 48px; flex-shrink: 0;
-    background: rgba(0,229,255,0.08);
-    border: 1px solid rgba(0,229,255,0.2);
-    display: grid; place-items: center;
-    font-size: 20px;
-  }
+  .channel-icon { width: 48px; height: 48px; flex-shrink: 0; background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.2); display: grid; place-items: center; font-size: 20px; }
   .channel-body { flex: 1; }
-  .channel-label {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    letter-spacing: 2px; color: var(--cyan); margin-bottom: 6px;
-  }
-  .channel-value {
-    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
-    letter-spacing: 1px; margin-bottom: 4px; word-break: break-all;
-  }
-  .channel-note {
-    font-size: 12px; color: rgba(242,239,232,0.35); line-height: 1.5;
-  }
+  .channel-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--cyan); margin-bottom: 6px; }
+  .channel-value { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 4px; word-break: break-all; }
+  .channel-note { font-size: 12px; color: rgba(242,239,232,0.35); line-height: 1.5; }
 
   /* ── FORM PANEL ── */
-  .contact-form-wrap {
-    padding: 48px 44px;
-    background: rgba(242,239,232,0.02);
-    border: 1px solid rgba(242,239,232,0.07);
-    position: relative; overflow: hidden;
-  }
-  .contact-form-wrap::after {
-    content: 'MSG';
-    position: absolute; right: -10px; bottom: -24px;
-    font-family: 'Bebas Neue', sans-serif; font-size: 120px;
-    color: rgba(0,229,255,0.04); line-height: 1; pointer-events: none;
-  }
+  .contact-form-wrap { padding: 48px 44px; background: rgba(242,239,232,0.02); border: 1px solid rgba(242,239,232,0.07); position: relative; overflow: hidden; }
+  .contact-form-wrap::after { content: 'MSG'; position: absolute; right: -10px; bottom: -24px; font-family: 'Bebas Neue', sans-serif; font-size: 120px; color: rgba(0,229,255,0.04); line-height: 1; pointer-events: none; }
 
-  .form-heading {
-    font-family: 'Bebas Neue', sans-serif; font-size: 28px;
-    letter-spacing: 2px; margin-bottom: 6px;
-  }
-  .form-sub {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    color: rgba(242,239,232,0.3); letter-spacing: 1px;
-    margin-bottom: 36px;
-  }
-
+  .form-heading { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; margin-bottom: 6px; }
+  .form-sub { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(242,239,232,0.3); letter-spacing: 1px; margin-bottom: 36px; }
   .form-row { margin-bottom: 20px; }
   .form-row-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 
-  .form-label {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    letter-spacing: 2px; color: var(--cyan);
-    display: block; margin-bottom: 8px;
-  }
+  .form-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--cyan); display: block; margin-bottom: 8px; }
 
-  .form-input, .form-textarea {
-    width: 100%; padding: 14px 16px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(242,239,232,0.1);
-    color: var(--paper);
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    outline: none; transition: border-color .2s, background .2s;
-    cursor: none;
-  }
-  .form-input:focus, .form-textarea:focus {
-    border-color: rgba(0,229,255,0.4);
-    background: rgba(0,229,255,0.03);
-  }
-  .form-input::placeholder, .form-textarea::placeholder {
-    color: rgba(242,239,232,0.2);
-    font-family: 'Space Mono', monospace; font-size: 11px;
-  }
+  .form-input, .form-textarea { width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(242,239,232,0.1); color: var(--paper); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color .2s, background .2s; cursor: none; }
+  .form-input:focus, .form-textarea:focus { border-color: rgba(0,229,255,0.4); background: rgba(0,229,255,0.03); }
+  .form-input::placeholder, .form-textarea::placeholder { color: rgba(242,239,232,0.2); font-family: 'Space Mono', monospace; font-size: 11px; }
   .form-textarea { resize: vertical; min-height: 130px; }
 
-  .form-submit {
-    font-family: 'Space Mono', monospace; font-size: 11px;
-    letter-spacing: 2px; color: var(--ink);
-    background: var(--cyan); padding: 14px 32px;
-    border: 1px solid var(--cyan);
-    font-weight: 700; cursor: none;
-    transition: all .2s; display: inline-flex; align-items: center; gap: 10px;
-    margin-top: 8px;
-  }
-  .form-submit:hover { background: transparent; color: var(--cyan); }
+  /* Error state */
+  .form-input.error, .form-textarea.error { border-color: var(--red) !important; background: rgba(255,45,85,0.05) !important; }
+  .field-error { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; color: var(--red); margin-top: 6px; display: none; }
+  .field-error.show { display: block; }
+
+  .form-submit { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--ink); background: var(--cyan); padding: 14px 32px; border: 1px solid var(--cyan); font-weight: 700; cursor: none; transition: all .2s; display: inline-flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .form-submit:hover:not(:disabled) { background: transparent; color: var(--cyan); }
+  .form-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── TOAST ── */
+  .toast { position: fixed; bottom: 40px; right: 40px; z-index: 9998; padding: 20px 28px; background: rgba(10,10,15,0.97); border: 1px solid rgba(0,229,255,0.3); display: flex; align-items: flex-start; gap: 16px; min-width: 320px; max-width: 420px; transform: translateY(120px); opacity: 0; transition: transform .4s cubic-bezier(.22,1,.36,1), opacity .4s; pointer-events: none; }
+  .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .toast.error { border-color: rgba(255,45,85,0.4); }
+  .toast-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .toast-body { flex: 1; }
+  .toast-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; margin-bottom: 4px; color: var(--cyan); }
+  .toast.error .toast-title { color: var(--red); }
+  .toast-msg { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.5px; color: rgba(242,239,232,0.5); line-height: 1.6; }
+  .toast-close { font-size: 18px; color: rgba(242,239,232,0.3); cursor: none; background: none; border: none; padding: 0; line-height: 1; transition: color .2s; flex-shrink: 0; }
+  .toast-close:hover { color: var(--cyan); }
 
   /* ── LOCATION STRIP ── */
-  .location-strip {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
-  }
-  .location-tile {
-    padding: 32px 32px;
-    background: rgba(242,239,232,0.02);
-    border: 1px solid rgba(242,239,232,0.07);
-    transition: all .3s;
-  }
+  .location-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .location-tile { padding: 32px 32px; background: rgba(242,239,232,0.02); border: 1px solid rgba(242,239,232,0.07); transition: all .3s; }
   .location-tile:hover { background: rgba(0,229,255,0.03); border-color: rgba(0,229,255,0.2); }
-  .location-tile-label {
-    font-family: 'Space Mono', monospace; font-size: 9px;
-    letter-spacing: 2px; color: var(--cyan); margin-bottom: 10px;
-  }
-  .location-tile-value {
-    font-family: 'Bebas Neue', sans-serif; font-size: 20px;
-    letter-spacing: 1px; margin-bottom: 4px; line-height: 1.2;
-  }
-  .location-tile-sub {
-    font-size: 12px; color: rgba(242,239,232,0.35); line-height: 1.5;
-  }
+  .location-tile-label { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--cyan); margin-bottom: 10px; }
+  .location-tile-value { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; margin-bottom: 4px; line-height: 1.2; }
+  .location-tile-sub { font-size: 12px; color: rgba(242,239,232,0.35); line-height: 1.5; }
 
   /* ── FOOTER ── */
   footer { padding: 50px 6%; border-top: 1px solid rgba(242,239,232,0.08); display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
@@ -225,14 +132,8 @@
   .reveal.in-view { opacity: 1; transform: translateY(0); }
 
   /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .contact-wrap { grid-template-columns: 1fr; }
-    .location-strip { grid-template-columns: 1fr; }
-    .form-row-split { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 768px) {
-    nav ul { display: none; }
-  }
+  @media (max-width: 900px) { .contact-wrap { grid-template-columns: 1fr; } .location-strip { grid-template-columns: 1fr; } .form-row-split { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) { nav ul { display: none; } }
 </style>
 </head>
 <body>
@@ -240,6 +141,16 @@
 <div class="cursor">
   <div class="cursor-ring"></div>
   <div class="cursor-dot"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toast-icon">✔</div>
+  <div class="toast-body">
+    <div class="toast-title" id="toast-title">Message Sent</div>
+    <div class="toast-msg"   id="toast-msg">We'll get back to you within 48 hours.</div>
+  </div>
+  <button class="toast-close" onclick="hideToast()">✕</button>
 </div>
 
 <!-- Nav -->
@@ -283,7 +194,6 @@
 
 <main class="main">
 
-  <!-- Contact Section -->
   <section style="margin-bottom: 80px;">
     <div class="section-label reveal">REACH OUT</div>
     <h2 class="section-title reveal">CONTACT<br>CHANNELS</h2>
@@ -311,7 +221,7 @@
           </div>
         </a>
 
-        <div class="contact-channel reveal" style="transition-delay:.2s; text-decoration:none;">
+        <div class="contact-channel reveal" style="transition-delay:.2s">
           <div class="channel-icon">🏛</div>
           <div class="channel-body">
             <div class="channel-label">// INSTITUTION</div>
@@ -320,7 +230,7 @@
           </div>
         </div>
 
-        <div class="contact-channel reveal" style="transition-delay:.3s;">
+        <div class="contact-channel reveal" style="transition-delay:.3s">
           <div class="channel-icon">🕐</div>
           <div class="channel-body">
             <div class="channel-label">// RESPONSE TIME</div>
@@ -338,26 +248,30 @@
 
         <div class="form-row-split">
           <div>
-            <label class="form-label">// NAME</label>
-            <input class="form-input" type="text" placeholder="Your full name">
+            <label class="form-label" for="f-name">// NAME</label>
+            <input id="f-name" class="form-input" type="text" placeholder="Your full name">
+            <div class="field-error" id="err-name">Name is required</div>
           </div>
           <div>
-            <label class="form-label">// EMAIL</label>
-            <input class="form-input" type="email" placeholder="your@email.com">
+            <label class="form-label" for="f-email">// EMAIL</label>
+            <input id="f-email" class="form-input" type="email" placeholder="your@email.com">
+            <div class="field-error" id="err-email">Valid email is required</div>
           </div>
         </div>
 
         <div class="form-row">
-          <label class="form-label">// SUBJECT</label>
-          <input class="form-input" type="text" placeholder="What is this regarding?">
+          <label class="form-label" for="f-subject">// SUBJECT</label>
+          <input id="f-subject" class="form-input" type="text" placeholder="What is this regarding?">
+          <div class="field-error" id="err-subject">Subject is required</div>
         </div>
 
         <div class="form-row">
-          <label class="form-label">// MESSAGE</label>
-          <textarea class="form-textarea" placeholder="Write your message here..."></textarea>
+          <label class="form-label" for="f-message">// MESSAGE</label>
+          <textarea id="f-message" class="form-textarea" placeholder="Write your message here..."></textarea>
+          <div class="field-error" id="err-message">Message cannot be empty</div>
         </div>
 
-        <button class="form-submit">→ SEND MESSAGE</button>
+        <button class="form-submit" id="form-submit-btn" onclick="handleSubmit()">→ SEND MESSAGE</button>
       </div>
 
     </div>
@@ -388,7 +302,6 @@
 
 </main>
 
-<!-- Footer -->
 <footer>
   <div class="footer-logo">CISS</div>
   <div class="footer-text">© 2026 Research Project · SLIIT · All rights reserved</div>
@@ -400,8 +313,99 @@
   </div>
 </footer>
 
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  const dot = document.querySelector('.cursor-dot');
+  /* ─────────────────────────────────────────────────────
+     EMAILJS CONFIG
+     1. Sign up free at https://www.emailjs.com
+     2. Add a Service (Gmail / Outlook) → copy Service ID
+     3. Create a Template using these variables:
+           {{name}}     → sender's name
+           {{email}}    → sender's email
+           {{subject}}  → message subject
+           {{message}}  → message body
+           {{time}}     → auto timestamp
+     4. Account → API Keys → copy Public Key
+     5. Replace the three values below
+  ───────────────────────────────────────────────────── */
+  const EJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+  const EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+  const EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+
+  emailjs.init({ publicKey: EJS_PUBLIC_KEY });
+
+  /* ── Validation ── */
+  function validate() {
+    let ok = true;
+    const rules = [
+      { id: 'f-name',    err: 'err-name',    test: v => v.trim().length > 0 },
+      { id: 'f-email',   err: 'err-email',   test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) },
+      { id: 'f-subject', err: 'err-subject', test: v => v.trim().length > 0 },
+      { id: 'f-message', err: 'err-message', test: v => v.trim().length > 0 },
+    ];
+    rules.forEach(({ id, err, test }) => {
+      const el    = document.getElementById(id);
+      const errEl = document.getElementById(err);
+      if (!test(el.value)) {
+        el.classList.add('error'); errEl.classList.add('show'); ok = false;
+      } else {
+        el.classList.remove('error'); errEl.classList.remove('show');
+      }
+      el.addEventListener('input', () => {
+        if (test(el.value)) { el.classList.remove('error'); errEl.classList.remove('show'); }
+      });
+    });
+    return ok;
+  }
+
+  /* ── Toast ── */
+  let toastTimer;
+  function showToast(success, title, msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-icon').textContent  = success ? '✔' : '✕';
+    document.getElementById('toast-title').textContent = title;
+    document.getElementById('toast-msg').textContent   = msg;
+    t.classList.toggle('error', !success);
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 6000);
+  }
+  function hideToast() { document.getElementById('toast').classList.remove('show'); }
+
+  /* ── Submit ── */
+  async function handleSubmit() {
+    if (!validate()) return;
+
+    const btn = document.getElementById('form-submit-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ SENDING...';
+
+    const now = new Date();
+    const params = {
+      name:    document.getElementById('f-name').value.trim(),
+      email:   document.getElementById('f-email').value.trim(),
+      subject: document.getElementById('f-subject').value.trim(),
+      message: document.getElementById('f-message').value.trim(),
+      time:    now.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }),
+    };
+
+    try {
+      await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, params);
+      showToast(true, 'Message Sent', "We'll get back to you within 48 hours.");
+      ['f-name','f-email','f-subject','f-message'].forEach(id => document.getElementById(id).value = '');
+      btn.textContent = '✔ SENT';
+      setTimeout(() => { btn.textContent = '→ SEND MESSAGE'; btn.disabled = false; }, 3000);
+    } catch (err) {
+      console.error('EmailJS error:', err);
+      showToast(false, 'Send Failed', 'Something went wrong. Please email us directly.');
+      btn.textContent = '→ SEND MESSAGE';
+      btn.disabled = false;
+    }
+  }
+
+  /* ── Cursor ── */
+  const dot  = document.querySelector('.cursor-dot');
   const ring = document.querySelector('.cursor-ring');
   let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
   document.addEventListener('mousemove', e => {
@@ -415,6 +419,7 @@
     requestAnimationFrame(animateRing);
   })();
 
+  /* ── Scroll reveal ── */
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); } });
   }, { threshold: 0.1 });
