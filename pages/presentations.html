@@ -23,43 +23,35 @@
   .cursor { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; }
   .cursor-dot { width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; transform: translate(-50%,-50%); }
   .cursor-ring { width: 36px; height: 36px; border: 1px solid rgba(0,229,255,0.4); border-radius: 50%; transform: translate(-50%,-50%); transition: width .2s, height .2s, border-color .2s; position: absolute; top: 0; left: 0; }
-  body:has(a:hover) .cursor-ring, body:has(button:hover) .cursor-ring { width: 52px; height: 52px; border-color: var(--cyan); }
-
+  body:has(a:hover) .cursor-ring,
+  body:has(button:hover) .cursor-ring { width: 52px; height: 52px; border-color: var(--cyan); }
   body::before { content: ''; position: fixed; inset: 0; z-index: 9990; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; }
 
   /* ── NAV ── */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 22px 6%;
-    background: rgba(10,10,15,0.85);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(0,229,255,0.1);
-  }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; padding: 22px 6%; background: rgba(10,10,15,0.85); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(0,229,255,0.1); }
   .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; color: var(--cyan); text-shadow: 0 0 20px rgba(0,229,255,0.5); text-decoration: none; }
   nav ul { list-style: none; display: flex; gap: 8px; }
   nav ul li a { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: rgba(242,239,232,0.55); text-decoration: none; padding: 7px 14px; border: 1px solid transparent; border-radius: 2px; transition: all .2s; }
   nav ul li a:hover, nav ul li a.active { color: var(--cyan); border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.05); }
 
   /* ── PAGE HEADER ── */
-  .page-header {
-    min-height: 44vh; padding: 160px 6% 80px;
-    position: relative; overflow: hidden; display: flex; align-items: flex-end;
-  }
-  .page-header::before {
-    content: ''; position: absolute; inset: 0;
-    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 60px 60px; animation: gridShift 20s linear infinite;
-  }
+  .page-header { min-height: 44vh; padding: 160px 6% 80px; position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+  .page-header::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 60px 60px; animation: gridShift 20s linear infinite; }
   @keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
   .page-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 160px; background: linear-gradient(transparent, var(--ink)); }
-  .header-ghost { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 14vw, 200px); color: rgba(0,229,255,0.04); letter-spacing: 8px; right: 4%; bottom: -20px; line-height: 1; user-select: none; z-index: 0; }
+  .header-ghost { position: absolute; font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px, 13vw, 180px); color: rgba(0,229,255,0.04); letter-spacing: 8px; right: 4%; bottom: -20px; line-height: 1; user-select: none; z-index: 0; }
   .page-header-content { position: relative; z-index: 2; }
   .breadcrumb { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: rgba(0,229,255,0.6); margin-bottom: 16px; }
   .breadcrumb a { color: inherit; text-decoration: none; }
   .breadcrumb a:hover { color: var(--cyan); }
   .page-header h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 8vw, 110px); line-height: 0.9; letter-spacing: 3px; }
   .page-header h1 em { font-style: normal; color: var(--cyan); }
+
+  /* header stat badges */
+  .header-stats { display: flex; gap: 24px; margin-top: 32px; flex-wrap: wrap; }
+  .header-stat { padding: 8px 18px; background: rgba(0,229,255,0.06); border: 1px solid rgba(0,229,255,0.18); }
+  .header-stat span { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px; color: var(--cyan); display: block; margin-bottom: 2px; }
+  .header-stat strong { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; }
 
   /* ── TICKER ── */
   .ticker { background: var(--cyan); color: var(--ink); padding: 10px 0; overflow: hidden; }
@@ -74,160 +66,63 @@
   .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,229,255,0.4), transparent); }
   .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 4vw, 60px); letter-spacing: 2px; margin-bottom: 40px; line-height: 1; }
 
-  /* ── PRESENTATION CARDS ── */
-  .pres-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2px;
-    margin-bottom: 100px;
-  }
+  /* ── FILTER BAR ── */
+  .filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 48px; flex-wrap: wrap; }
+  .filter-btn { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: rgba(242,239,232,0.5); background: rgba(242,239,232,0.03); border: 1px solid rgba(242,239,232,0.1); padding: 8px 18px; cursor: none; transition: all .2s; }
+  .filter-btn:hover, .filter-btn.active { color: var(--cyan); border-color: rgba(0,229,255,0.35); background: rgba(0,229,255,0.06); }
+  .filter-count { font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(242,239,232,0.25); letter-spacing: 1px; margin-left: auto; }
 
-  .pres-card {
-    border: 1px solid rgba(242,239,232,0.07);
-    background: rgba(242,239,232,0.02);
-    position: relative; overflow: hidden;
-    transition: all .3s;
-    display: flex; flex-direction: column;
-  }
+  /* ── PRESENTATION GRID ── */
+  .pres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2px; }
+
+  /* ── CARD ── */
+  .pres-card { background: rgba(242,239,232,0.02); border: 1px solid rgba(242,239,232,0.07); position: relative; overflow: hidden; display: flex; flex-direction: column; transition: border-color .3s, background .3s; }
   .pres-card:hover { border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.03); }
-  .pres-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: var(--cyan);
-    transform: scaleX(0); transform-origin: left; transition: transform .35s;
-  }
+  .pres-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cyan), transparent); transform: scaleX(0); transform-origin: left; transition: transform .4s cubic-bezier(.22,1,.36,1); }
   .pres-card:hover::before { transform: scaleX(1); }
 
-  /* ── SLIDE PREVIEW AREA ── */
-  .pres-preview {
-    aspect-ratio: 16 / 9;
-    background: rgba(0,0,0,0.4);
-    border-bottom: 1px solid rgba(242,239,232,0.05);
-    position: relative; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .card-cover { width: 100%; aspect-ratio: 16/9; background: rgba(0,229,255,0.04); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-bottom: 1px solid rgba(242,239,232,0.07); }
+  .card-cover-bg { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(5, 1fr); gap: 1px; opacity: 0.4; }
+  .card-cover-cell { background: rgba(0,229,255,0.06); transition: background .4s; }
+  .pres-card:hover .card-cover-cell { background: rgba(0,229,255,0.1); }
+  .card-cover-num { position: relative; z-index: 1; font-family: 'Bebas Neue', sans-serif; font-size: 72px; letter-spacing: 4px; color: rgba(0,229,255,0.12); line-height: 1; transition: color .3s; }
+  .pres-card:hover .card-cover-num { color: rgba(0,229,255,0.22); }
+  .card-cover-icon { position: absolute; bottom: 14px; right: 18px; font-size: 28px; opacity: 0.3; transition: opacity .3s, transform .3s; }
+  .pres-card:hover .card-cover-icon { opacity: 0.6; transform: scale(1.1); }
 
-  /* Simulated slide mockup */
-  .slide-mock {
-    width: 80%; height: 75%;
-    background: rgba(10,10,15,0.9);
-    border: 1px solid rgba(0,229,255,0.15);
-    position: relative;
-    display: flex; flex-direction: column;
-    padding: 16px 20px;
-    gap: 8px;
-    box-shadow: 0 0 40px rgba(0,229,255,0.06);
-  }
-  .slide-mock-bar {
-    height: 3px; width: 40%; background: var(--cyan); opacity: 0.7;
-  }
-  .slide-mock-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(12px, 2vw, 22px);
-    color: var(--paper); letter-spacing: 2px; line-height: 1;
-  }
-  .slide-mock-sub {
-    font-family: 'Space Mono', monospace;
-    font-size: clamp(7px, 1vw, 10px);
-    color: rgba(242,239,232,0.3); letter-spacing: 1px;
-  }
-  .slide-mock-lines {
-    margin-top: auto;
-    display: flex; flex-direction: column; gap: 5px;
-  }
-  .slide-mock-line {
-    height: 2px; border-radius: 1px;
-    background: rgba(242,239,232,0.08);
-  }
-  .slide-mock-line:first-child { width: 90%; }
-  .slide-mock-line:nth-child(2) { width: 75%; }
-  .slide-mock-line:last-child { width: 55%; }
+  .card-body { padding: 28px 28px 24px; flex: 1; display: flex; flex-direction: column; }
+  .card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .card-tag { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px; padding: 4px 10px; border: 1px solid rgba(0,229,255,0.3); color: var(--cyan); background: rgba(0,229,255,0.05); }
+  .card-tag.red { border-color: rgba(255,45,85,0.3); color: var(--red); background: rgba(255,45,85,0.05); }
+  .card-tag.amber { border-color: rgba(255,190,0,0.3); color: #ffbe00; background: rgba(255,190,0,0.05); }
+  .card-date { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; color: rgba(242,239,232,0.3); margin-left: auto; }
 
-  /* Decorative grid behind preview */
-  .pres-preview::before {
-    content: '';
-    position: absolute; inset: 0;
-    background-image: linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
+  .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1.5px; line-height: 1.1; margin-bottom: 10px; }
+  .card-desc { font-size: 12.5px; color: rgba(242,239,232,0.45); line-height: 1.65; flex: 1; margin-bottom: 24px; }
 
-  /* Slide counter badge */
-  .slide-count-badge {
-    position: absolute; bottom: 12px; right: 12px;
-    font-family: 'Space Mono', monospace; font-size: 9px;
-    letter-spacing: 1px; color: var(--ink);
-    background: var(--cyan); padding: 4px 10px; font-weight: 700;
-  }
+  .card-footer { display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(242,239,232,0.07); padding-top: 20px; }
+  .card-dl { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: var(--ink); background: var(--cyan); padding: 9px 20px; text-decoration: none; font-weight: 700; transition: background .2s, color .2s; display: inline-flex; align-items: center; gap: 8px; }
+  .card-dl:hover { background: transparent; color: var(--cyan); }
+  .card-view { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1.5px; color: rgba(242,239,232,0.4); border: 1px solid rgba(242,239,232,0.12); padding: 9px 20px; text-decoration: none; transition: all .2s; }
+  .card-view:hover { color: var(--cyan); border-color: rgba(0,229,255,0.3); }
 
-  /* ── CARD BODY ── */
-  .pres-card-top {
-    padding: 32px 36px 20px;
-    border-bottom: 1px solid rgba(242,239,232,0.05);
-    position: relative;
-  }
-  .pres-num {
-    position: absolute; top: 24px; right: 28px;
-    font-family: 'Bebas Neue', sans-serif; font-size: 52px;
-    color: rgba(0,229,255,0.06); line-height: 1; pointer-events: none;
-  }
-  .pres-category {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    letter-spacing: 2px; color: var(--cyan); margin-bottom: 10px;
-  }
-  .pres-title {
-    font-family: 'Bebas Neue', sans-serif; font-size: 28px;
-    letter-spacing: 1px; margin-bottom: 6px; line-height: 1.1;
-  }
-  .pres-subtitle {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    color: rgba(242,239,232,0.3); letter-spacing: 1px;
-  }
+  /* card hidden for filter */
+  .pres-card.hidden { display: none; }
 
-  .pres-card-body { padding: 24px 36px; flex: 1; }
-  .pres-card-body p { font-size: 13px; line-height: 1.7; color: rgba(242,239,232,0.5); margin-bottom: 16px; }
+  /* ── TIMELINE STRIP ── */
+  .timeline { margin-top: 100px; }
+  .timeline-track { position: relative; padding-left: 32px; display: flex; flex-direction: column; gap: 0; }
+  .timeline-track::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 1px; background: linear-gradient(180deg, var(--cyan), rgba(0,229,255,0.1)); }
 
-  .pres-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag {
-    font-family: 'Space Mono', monospace; font-size: 9px;
-    padding: 3px 9px; letter-spacing: 1px;
-    border: 1px solid rgba(242,239,232,0.1);
-    color: rgba(242,239,232,0.35);
-  }
+  .timeline-item { position: relative; padding: 28px 0 28px 40px; border-bottom: 1px solid rgba(242,239,232,0.05); display: grid; grid-template-columns: 160px 1fr; gap: 32px; align-items: start; }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-item::before { content: ''; position: absolute; left: -4px; top: 36px; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: 2px solid var(--cyan); transition: background .3s; }
+  .timeline-item:hover::before { background: var(--cyan); }
 
-  .pres-card-foot {
-    padding: 20px 36px;
-    border-top: 1px solid rgba(242,239,232,0.05);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .pres-meta {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    color: rgba(242,239,232,0.25); letter-spacing: 1px;
-  }
-  .pres-btn {
-    font-family: 'Space Mono', monospace; font-size: 10px;
-    letter-spacing: 2px; color: var(--ink);
-    background: var(--cyan); padding: 9px 20px;
-    display: inline-flex; align-items: center; gap: 8px;
-    text-decoration: none; font-weight: 700;
-    transition: all .2s; border: 1px solid var(--cyan);
-    cursor: none;
-  }
-  .pres-btn:hover { background: transparent; color: var(--cyan); }
-
-  /* ── NOTICE BANNER ── */
-  .notice-banner {
-    padding: 28px 36px;
-    background: rgba(0,229,255,0.04);
-    border: 1px solid rgba(0,229,255,0.15);
-    display: flex; align-items: flex-start; gap: 20px;
-    margin-bottom: 100px;
-  }
-  .notice-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
-  .notice-text {
-    font-family: 'Space Mono', monospace; font-size: 11px;
-    line-height: 1.8; color: rgba(242,239,232,0.55); letter-spacing: 0.5px;
-  }
-  .notice-text strong { color: var(--cyan); }
+  .timeline-date { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; color: var(--cyan); line-height: 1.5; padding-top: 2px; }
+  .timeline-date small { display: block; font-size: 9px; color: rgba(242,239,232,0.3); margin-top: 4px; letter-spacing: 1.5px; }
+  .timeline-body .tl-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; margin-bottom: 6px; }
+  .timeline-body .tl-desc { font-size: 12.5px; color: rgba(242,239,232,0.4); line-height: 1.6; }
 
   /* ── FOOTER ── */
   footer { padding: 50px 6%; border-top: 1px solid rgba(242,239,232,0.08); display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
@@ -242,10 +137,12 @@
   .reveal.in-view { opacity: 1; transform: translateY(0); }
 
   /* ── RESPONSIVE ── */
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     .pres-grid { grid-template-columns: 1fr; }
-    nav ul { display: none; }
+    .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+    .filter-count { display: none; }
   }
+  @media (max-width: 768px) { nav ul { display: none; } }
 </style>
 </head>
 <body>
@@ -274,116 +171,242 @@
   <div class="header-ghost">SLIDES</div>
   <div class="page-header-content">
     <div class="breadcrumb"><a href="../index.html">HOME</a> / PRESENTATIONS</div>
-    <h1>PROJECT<br><em>PRESENTATIONS</em></h1>
+    <h1>RESEARCH<br><em>PRESENTATIONS</em></h1>
+    <div class="header-stats">
+      <div class="header-stat">
+        <span>// TOTAL DECKS</span>
+        <strong id="total-count">6</strong>
+      </div>
+      <div class="header-stat">
+        <span>// PROJECT YEAR</span>
+        <strong>2026</strong>
+      </div>
+      <div class="header-stat">
+        <span>// INSTITUTION</span>
+        <strong>SLIIT</strong>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- Ticker -->
 <div class="ticker">
   <div class="ticker-inner">
-    <span class="ticker-item">PROPOSAL SLIDES</span>
-    <span class="ticker-item">FINAL SLIDES</span>
+    <span class="ticker-item">PROPOSAL</span>
+    <span class="ticker-item">PROGRESS REVIEW 1</span>
+    <span class="ticker-item">PROGRESS REVIEW 2</span>
+    <span class="ticker-item">FINAL DEFENCE</span>
     <span class="ticker-item">SLIIT · 2026</span>
     <span class="ticker-item">BSC HONS IT</span>
-    <span class="ticker-item">FACULTY OF COMPUTING</span>
-    <span class="ticker-item">PROPOSAL SLIDES</span>
-    <span class="ticker-item">FINAL SLIDES</span>
+    <span class="ticker-item">PROPOSAL</span>
+    <span class="ticker-item">PROGRESS REVIEW 1</span>
+    <span class="ticker-item">PROGRESS REVIEW 2</span>
+    <span class="ticker-item">FINAL DEFENCE</span>
     <span class="ticker-item">SLIIT · 2026</span>
     <span class="ticker-item">BSC HONS IT</span>
-    <span class="ticker-item">FACULTY OF COMPUTING</span>
   </div>
 </div>
 
 <main class="main">
 
-  <!-- Notice -->
-  <div class="notice-banner reveal">
-    <div class="notice-icon">🖥</div>
-    <div class="notice-text">
-      All slides are official presentations delivered as part of the <strong>CISS Final Year Research Project</strong> at SLIIT. Click a slide deck to view or download. Presentations are provided for academic reference only.
-    </div>
-  </div>
-
-  <!-- Presentations -->
-  <section>
+  <!-- ── PRESENTATIONS GRID ── -->
+  <section style="margin-bottom: 100px;">
     <div class="section-label reveal">SLIDE DECKS</div>
     <h2 class="section-title reveal">ALL<br>PRESENTATIONS</h2>
 
-    <div class="pres-grid">
+    <!-- Filter Bar -->
+    <div class="filter-bar reveal">
+      <button class="filter-btn active" data-filter="all">ALL</button>
+      <button class="filter-btn" data-filter="proposal">PROPOSAL</button>
+      <button class="filter-btn" data-filter="progress">PROGRESS REVIEW</button>
+      <button class="filter-btn" data-filter="final">FINAL</button>
+      <div class="filter-count" id="visible-count">SHOWING 6 OF 6</div>
+    </div>
 
-      <!-- Proposal Slides -->
-      <div class="pres-card reveal">
-        <div class="pres-preview">
-          <div class="slide-mock">
-            <div class="slide-mock-bar"></div>
-            <div class="slide-mock-title">Research Proposal</div>
-            <div class="slide-mock-sub">CISS · SLIIT · 2025</div>
-            <div class="slide-mock-lines">
-              <div class="slide-mock-line"></div>
-              <div class="slide-mock-line"></div>
-              <div class="slide-mock-line"></div>
-            </div>
+    <!-- Grid -->
+    <div class="pres-grid" id="pres-grid">
+
+      <!-- Card 1 -->
+      <div class="pres-card reveal" data-category="proposal">
+        <div class="card-cover">
+          <div class="card-cover-bg" id="grid1"></div>
+          <div class="card-cover-num">01</div>
+          <div class="card-cover-icon">📋</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-tag">PROPOSAL</span>
+            <span class="card-date">MAR 2025</span>
           </div>
-          <div class="slide-count-badge">18 SLIDES</div>
-        </div>
-        <div class="pres-card-top">
-          <div class="pres-num">01</div>
-          <div class="pres-category">// INITIAL PRESENTATION</div>
-          <div class="pres-title">Proposal Slides</div>
-          <div class="pres-subtitle">CISS · SLIIT · 2025</div>
-        </div>
-        <div class="pres-card-body">
-          <p>
-            The proposal presentation delivered to the evaluation panel, introducing the problem domain, motivation, objectives, proposed system architecture, and expected outcomes of the CISS research project.
-          </p>
-          <div class="pres-tags">
-            <span class="tag">Problem Statement</span>
-            <span class="tag">Objectives</span>
-            <span class="tag">Architecture</span>
-            <span class="tag">Timeline</span>
+          <div class="card-title">Project Proposal Presentation</div>
+          <div class="card-desc">Initial presentation outlining the research problem, objectives, scope, and proposed methodology for the CISS project submitted to the Faculty of Computing.</div>
+          <div class="card-footer">
+            <a class="card-dl" href="#" target="_blank">↓ DOWNLOAD</a>
+            <a class="card-view" href="#" target="_blank">⤢ VIEW</a>
           </div>
-        </div>
-        <div class="pres-card-foot">
-          <span class="pres-meta">PPTX · ~5.2 MB</span>
-          <a class="pres-btn" href="#">▶ VIEW SLIDES</a>
         </div>
       </div>
 
-      <!-- Final Slides -->
-      <div class="pres-card reveal" style="transition-delay:.1s">
-        <div class="pres-preview">
-          <div class="slide-mock">
-            <div class="slide-mock-bar" style="width:65%"></div>
-            <div class="slide-mock-title">Final Presentation</div>
-            <div class="slide-mock-sub">CISS · SLIIT · 2026</div>
-            <div class="slide-mock-lines">
-              <div class="slide-mock-line"></div>
-              <div class="slide-mock-line"></div>
-              <div class="slide-mock-line"></div>
-            </div>
+      <!-- Card 2 -->
+      <div class="pres-card reveal" data-category="proposal" style="transition-delay:.08s">
+        <div class="card-cover">
+          <div class="card-cover-bg" id="grid2"></div>
+          <div class="card-cover-num">02</div>
+          <div class="card-cover-icon">🔬</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-tag">PROPOSAL</span>
+            <span class="card-date">APR 2025</span>
           </div>
-          <div class="slide-count-badge">34 SLIDES</div>
-        </div>
-        <div class="pres-card-top">
-          <div class="pres-num">02</div>
-          <div class="pres-category">// FINAL PRESENTATION</div>
-          <div class="pres-title">Final Slides</div>
-          <div class="pres-subtitle">CISS · SLIIT · 2026</div>
-        </div>
-        <div class="pres-card-body">
-          <p>
-            The final viva presentation covering the complete CISS system — implementation details, model performance, blockchain audit results, evaluation methodology, findings, and conclusions.
-          </p>
-          <div class="pres-tags">
-            <span class="tag">Implementation</span>
-            <span class="tag">Results</span>
-            <span class="tag">Evaluation</span>
-            <span class="tag">Conclusions</span>
+          <div class="card-title">Research Proposal Defence</div>
+          <div class="card-desc">Defended proposal covering the literature review, theoretical framework, and system architecture plan presented to the evaluation panel.</div>
+          <div class="card-footer">
+            <a class="card-dl" href="#" target="_blank">↓ DOWNLOAD</a>
+            <a class="card-view" href="#" target="_blank">⤢ VIEW</a>
           </div>
         </div>
-        <div class="pres-card-foot">
-          <span class="pres-meta">PPTX · ~11.8 MB</span>
-          <a class="pres-btn" href="#">▶ VIEW SLIDES</a>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="pres-card reveal" data-category="progress" style="transition-delay:.16s">
+        <div class="card-cover">
+          <div class="card-cover-bg" id="grid3"></div>
+          <div class="card-cover-num">03</div>
+          <div class="card-cover-icon">⚙️</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-tag amber">PROGRESS REVIEW 1</span>
+            <span class="card-date">JUL 2025</span>
+          </div>
+          <div class="card-title">Progress Review 01</div>
+          <div class="card-desc">First progress review showcasing early system design, data collection methodology, initial prototype, and results from preliminary experiments.</div>
+          <div class="card-footer">
+            <a class="card-dl" href="#" target="_blank">↓ DOWNLOAD</a>
+            <a class="card-view" href="#" target="_blank">⤢ VIEW</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="pres-card reveal" data-category="progress" style="transition-delay:.24s">
+        <div class="card-cover">
+          <div class="card-cover-bg" id="grid4"></div>
+          <div class="card-cover-num">04</div>
+          <div class="card-cover-icon">📊</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-tag amber">PROGRESS REVIEW 2</span>
+            <span class="card-date">OCT 2025</span>
+          </div>
+          <div class="card-title">Progress Review 02</div>
+          <div class="card-desc">Second progress review detailing model development, experimental results, comparative analysis, and refined system architecture with performance benchmarks.</div>
+          <div class="card-footer">
+            <a class="card-dl" href="#" target="_blank">↓ DOWNLOAD</a>
+            <a class="card-view" href="#" target="_blank">⤢ VIEW</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="pres-card reveal" data-category="final" style="transition-delay:.32s">
+        <div class="card-cover">
+          <div class="card-cover-bg" id="grid5"></div>
+          <div class="card-cover-num">05</div>
+          <div class="card-cover-icon">🏆</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-tag red">FINAL DEFENCE</span>
+            <span class="card-date">FEB 2026</span>
+          </div>
+          <div class="card-title">Final Presentation</div>
+          <div class="card-desc">Final defence presentation encompassing the complete research journey, full system evaluation, key findings, contributions, and future directions.</div>
+          <div class="card-footer">
+            <a class="card-dl" href="#" target="_blank">↓ DOWNLOAD</a>
+            <a class="card-view" href="#" target="_blank">⤢ VIEW</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="pres-card reveal" data-category="final" style="transition-delay:.4s">
+        <div class="card-cover">
+          <div class="card-cover-bg" id="grid6"></div>
+          <div class="card-cover-num">06</div>
+          <div class="card-cover-icon">🎓</div>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-tag red">FINAL DEFENCE</span>
+            <span class="card-date">MAR 2026</span>
+          </div>
+          <div class="card-title">Viva Voce Presentation</div>
+          <div class="card-desc">Viva voce deck used during the oral examination, addressing panel questions and summarising the core technical contributions of the CISS research project.</div>
+          <div class="card-footer">
+            <a class="card-dl" href="#" target="_blank">↓ DOWNLOAD</a>
+            <a class="card-view" href="#" target="_blank">⤢ VIEW</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── TIMELINE ── -->
+  <section class="timeline">
+    <div class="section-label reveal">CHRONOLOGY</div>
+    <h2 class="section-title reveal">PRESENTATION<br>TIMELINE</h2>
+
+    <div class="timeline-track">
+
+      <div class="timeline-item reveal">
+        <div class="timeline-date">MAR 2025<small>// MILESTONE 01</small></div>
+        <div class="timeline-body">
+          <div class="tl-title">Project Proposal Presentation</div>
+          <div class="tl-desc">Formal submission and presentation of the initial research proposal to the Faculty of Computing, outlining the problem statement and scope.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="transition-delay:.1s">
+        <div class="timeline-date">APR 2025<small>// MILESTONE 02</small></div>
+        <div class="timeline-body">
+          <div class="tl-title">Research Proposal Defence</div>
+          <div class="tl-desc">Defence of the proposal before the evaluation panel with Q&A session validating research feasibility and academic rigour.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="transition-delay:.2s">
+        <div class="timeline-date">JUL 2025<small>// MILESTONE 03</small></div>
+        <div class="timeline-body">
+          <div class="tl-title">Progress Review 01</div>
+          <div class="tl-desc">First formal progress review covering system design decisions, early prototype demonstration, and preliminary experimental results.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="transition-delay:.3s">
+        <div class="timeline-date">OCT 2025<small>// MILESTONE 04</small></div>
+        <div class="timeline-body">
+          <div class="tl-title">Progress Review 02</div>
+          <div class="tl-desc">Second review demonstrating a working system implementation, comparative benchmarks, and refined research outcomes.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="transition-delay:.4s">
+        <div class="timeline-date">FEB 2026<small>// MILESTONE 05</small></div>
+        <div class="timeline-body">
+          <div class="tl-title">Final Presentation</div>
+          <div class="tl-desc">Comprehensive final defence presenting complete system evaluation, key findings, and research contributions to the examination board.</div>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal" style="transition-delay:.5s">
+        <div class="timeline-date">MAR 2026<small>// MILESTONE 06</small></div>
+        <div class="timeline-body">
+          <div class="tl-title">Viva Voce</div>
+          <div class="tl-desc">Oral examination addressing panel queries and confirming the depth of the research contributions and outcomes of the CISS project.</div>
         </div>
       </div>
 
@@ -392,7 +415,6 @@
 
 </main>
 
-<!-- Footer -->
 <footer>
   <div class="footer-logo">CISS</div>
   <div class="footer-text">© 2026 Research Project · SLIIT · All rights reserved</div>
@@ -405,24 +427,63 @@
 </footer>
 
 <script>
-  const dot = document.querySelector('.cursor-dot');
+  /* ── Cursor ── */
+  const dot  = document.querySelector('.cursor-dot');
   const ring = document.querySelector('.cursor-ring');
   let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
   document.addEventListener('mousemove', e => {
     mouseX = e.clientX; mouseY = e.clientY;
-    dot.style.left = mouseX + 'px'; dot.style.top = mouseY + 'px';
+    dot.style.left = mouseX + 'px';
+    dot.style.top  = mouseY + 'px';
   });
   (function animateRing() {
     ringX += (mouseX - ringX) * 0.12;
     ringY += (mouseY - ringY) * 0.12;
-    ring.style.left = ringX + 'px'; ring.style.top = ringY + 'px';
+    ring.style.left = ringX + 'px';
+    ring.style.top  = ringY + 'px';
     requestAnimationFrame(animateRing);
   })();
 
+  /* ── Scroll reveal ── */
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); observer.unobserve(e.target); } });
   }, { threshold: 0.1 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ── Mosaic cover grids ── */
+  for (let g = 1; g <= 6; g++) {
+    const el = document.getElementById('grid' + g);
+    if (!el) continue;
+    for (let i = 0; i < 40; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'card-cover-cell';
+      cell.style.opacity = (Math.random() * 0.6 + 0.1).toFixed(2);
+      el.appendChild(cell);
+    }
+  }
+
+  /* ── Filter ── */
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.pres-card');
+  const visibleCount = document.getElementById('visible-count');
+  const totalCount   = document.getElementById('total-count');
+  const total = cards.length;
+  totalCount.textContent = total;
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      let visible = 0;
+      cards.forEach(card => {
+        const match = filter === 'all' || card.dataset.category === filter;
+        card.classList.toggle('hidden', !match);
+        if (match) visible++;
+      });
+      visibleCount.textContent = `SHOWING ${visible} OF ${total}`;
+    });
+  });
 </script>
 </body>
 </html>
